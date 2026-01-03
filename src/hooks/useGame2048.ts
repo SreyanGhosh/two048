@@ -93,26 +93,28 @@ export const useGame2048 = (initialSize: number = 4) => {
     };
   });
 
-  const initGame = useCallback((size?: number) => {
-    const gameSize = size ?? state.size;
-    const board = createEmptyBoard(gameSize);
-    const pos1 = addRandomTile(board);
-    const pos2 = addRandomTile(board);
-    const newTiles = new Set<string>();
-    if (pos1) newTiles.add(`${pos1[0]}-${pos1[1]}`);
-    if (pos2) newTiles.add(`${pos2[0]}-${pos2[1]}`);
-    
-    setState(prev => ({
-      ...prev,
-      board,
-      score: 0,
-      gameOver: false,
-      won: false,
-      size: gameSize,
-      newTiles,
-      mergedTiles: new Set(),
-    }));
-  }, [state.size]);
+  const initGame = useCallback((newSize?: number) => {
+    setState(prev => {
+      const gameSize = newSize ?? prev.size;
+      const board = createEmptyBoard(gameSize);
+      const pos1 = addRandomTile(board);
+      const pos2 = addRandomTile(board);
+      const newTiles = new Set<string>();
+      if (pos1) newTiles.add(`${pos1[0]}-${pos1[1]}`);
+      if (pos2) newTiles.add(`${pos2[0]}-${pos2[1]}`);
+      
+      return {
+        ...prev,
+        board,
+        score: 0,
+        gameOver: false,
+        won: false,
+        size: gameSize,
+        newTiles,
+        mergedTiles: new Set(),
+      };
+    });
+  }, []);
 
   const setTheme = useCallback((theme: Theme) => {
     localStorage.setItem('2048-theme', theme);
