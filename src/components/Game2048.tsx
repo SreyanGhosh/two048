@@ -37,7 +37,7 @@ export const Game2048 = () => {
         theme={theme}
         onSizeChange={setSize}
         onThemeChange={setTheme}
-        onNewGame={initGame}
+        onNewGame={() => initGame()}
       />
 
       <div className="relative">
@@ -55,7 +55,7 @@ export const Game2048 = () => {
           score={score}
           won={won}
           theme={theme}
-          onNewGame={initGame}
+          onNewGame={() => initGame()}
           onClose={() => setShowOverlay(false)}
         />
       </div>
