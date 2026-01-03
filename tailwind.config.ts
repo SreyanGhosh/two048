@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        game: ['Nunito', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +50,26 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        game: {
+          grid: "hsl(var(--game-grid))",
+          cell: "hsl(var(--game-cell-empty))",
+          textLight: "hsl(var(--game-text-light))",
+          textDark: "hsl(var(--game-text-dark))",
+        },
+        tile: {
+          2: "hsl(var(--tile-2))",
+          4: "hsl(var(--tile-4))",
+          8: "hsl(var(--tile-8))",
+          16: "hsl(var(--tile-16))",
+          32: "hsl(var(--tile-32))",
+          64: "hsl(var(--tile-64))",
+          128: "hsl(var(--tile-128))",
+          256: "hsl(var(--tile-256))",
+          512: "hsl(var(--tile-512))",
+          1024: "hsl(var(--tile-1024))",
+          2048: "hsl(var(--tile-2048))",
+          super: "hsl(var(--tile-super))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -65,20 +88,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
