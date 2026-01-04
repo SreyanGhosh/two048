@@ -11,7 +11,7 @@ interface GameHeaderProps {
   unlockedThemes?: Theme[];
 }
 
-const ALL_THEMES: Theme[] = ['classic', 'blue', 'fire', 'bubblegum', 'dark'];
+const ALL_THEMES: Theme[] = ['classic', 'blue', 'fire', 'bubblegum', 'dark', 'forest', 'sunset', 'lavender', 'mint', 'neon', 'aurora', 'cherry', 'gold', 'galaxy', 'rainbow', 'diamond'];
 
 const themeButtonStyles: Record<Theme, { bg: string; text: string }> = {
   classic: { bg: '#8f7a66', text: '#f9f6f2' },
@@ -19,6 +19,17 @@ const themeButtonStyles: Record<Theme, { bg: string; text: string }> = {
   fire: { bg: '#ff1a1a', text: '#f9f6f2' },
   bubblegum: { bg: '#ff4da6', text: '#ffffff' },
   dark: { bg: '#111', text: '#ffffff' },
+  forest: { bg: '#228b22', text: '#ffffff' },
+  sunset: { bg: '#ff6b35', text: '#ffffff' },
+  lavender: { bg: '#9b59b6', text: '#ffffff' },
+  mint: { bg: '#3eb489', text: '#ffffff' },
+  neon: { bg: '#ff00ff', text: '#00ffff' },
+  aurora: { bg: '#2ecc71', text: '#ffffff' },
+  cherry: { bg: '#ff69b4', text: '#ffffff' },
+  gold: { bg: '#ffd700', text: '#1a1a1a' },
+  galaxy: { bg: '#2c1654', text: '#ffffff' },
+  rainbow: { bg: '#ff0000', text: '#ffffff' },
+  diamond: { bg: '#b9f2ff', text: '#1a1a1a' },
 };
 
 const themeBoxStyles: Record<Theme, { bg: string; text: string }> = {
@@ -27,14 +38,36 @@ const themeBoxStyles: Record<Theme, { bg: string; text: string }> = {
   fire: { bg: '#ff1a1a', text: '#f9f6f2' },
   bubblegum: { bg: '#ff77c2', text: '#ffffff' },
   dark: { bg: '#222', text: '#ffffff' },
+  forest: { bg: '#2e8b57', text: '#ffffff' },
+  sunset: { bg: '#ff8c5a', text: '#ffffff' },
+  lavender: { bg: '#a569bd', text: '#ffffff' },
+  mint: { bg: '#48d1a9', text: '#ffffff' },
+  neon: { bg: '#8b00ff', text: '#00ffff' },
+  aurora: { bg: '#45b39d', text: '#ffffff' },
+  cherry: { bg: '#ff85a2', text: '#ffffff' },
+  gold: { bg: '#ffdf00', text: '#1a1a1a' },
+  galaxy: { bg: '#4a1c7a', text: '#ffffff' },
+  rainbow: { bg: '#ffa500', text: '#ffffff' },
+  diamond: { bg: '#e0ffff', text: '#1a1a1a' },
 };
 
 const themeNames: Record<Theme, string> = {
   classic: 'Classic',
-  blue: 'Blue',
+  blue: 'Ocean',
   fire: 'Fire',
   bubblegum: 'Bubblegum',
-  dark: 'Dark',
+  dark: 'Midnight',
+  forest: 'Forest',
+  sunset: 'Sunset',
+  lavender: 'Lavender',
+  mint: 'Mint',
+  neon: 'Neon',
+  aurora: 'Aurora',
+  cherry: 'Cherry',
+  gold: 'Gold',
+  galaxy: 'Galaxy',
+  rainbow: 'Rainbow',
+  diamond: 'Diamond',
 };
 
 export const GameHeader = ({

@@ -20,8 +20,8 @@ export const GameApp = () => {
     store.updateProgress(score, highestTile, isCompetitive);
   }, [store]);
 
-  const handleClaimReward = useCallback((id: string) => {
-    const reward = store.claimReward(id);
+  const handleClaimReward = useCallback((id: string, isDaily: boolean = false) => {
+    const reward = store.claimReward(id, isDaily);
     if (reward > 0) {
       toast.success(`+${reward} coins earned!`, {
         icon: '🪙',
@@ -76,6 +76,7 @@ export const GameApp = () => {
         return (
           <ChallengesScreen
             challenges={store.challenges}
+            dailyChallenges={store.dailyChallenges}
             onClaimReward={handleClaimReward}
             onBack={() => setCurrentScreen('home')}
           />
