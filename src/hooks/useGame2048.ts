@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 
-export type Theme = 'classic' | 'blue' | 'fire' | 'bubblegum' | 'dark';
+export type Theme = 'classic' | 'blue' | 'fire' | 'bubblegum' | 'dark' | 'forest' | 'sunset' | 'lavender' | 'mint' | 'neon' | 'aurora' | 'cherry' | 'gold' | 'galaxy' | 'rainbow' | 'diamond';
 
 interface GameState {
   board: number[][];
