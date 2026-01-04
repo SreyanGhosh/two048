@@ -6,6 +6,15 @@
 
 @layer base {
   :root {
+    /* Home screen gradient colors */
+    --home-primary: 260 70% 50%;
+    --home-secondary: 280 60% 45%;
+    --home-accent: 300 50% 40%;
+  }
+}
+
+@layer base {
+  :root {
     --background: 45 20% 96%;
     --foreground: 30 10% 20%;
 
@@ -129,6 +138,22 @@
   .animate-spawn {
     animation: spawn 200ms ease-out;
   }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 3s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin 4s linear infinite;
+  }
 }
 
 @keyframes pop {
@@ -159,5 +184,40 @@
   100% { 
     transform: scale(1); 
     opacity: 1; 
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(100vh) rotate(0deg); 
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(-100px) rotate(360deg); 
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.05); 
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-10px); 
   }
 }

@@ -56,6 +56,11 @@ export default {
           textLight: "hsl(var(--game-text-light))",
           textDark: "hsl(var(--game-text-dark))",
         },
+        home: {
+          primary: "hsl(var(--home-primary))",
+          secondary: "hsl(var(--home-secondary))",
+          accent: "hsl(var(--home-accent))",
+        },
         tile: {
           2: "hsl(var(--tile-2))",
           4: "hsl(var(--tile-4))",

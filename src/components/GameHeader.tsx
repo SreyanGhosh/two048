@@ -8,7 +8,10 @@ interface GameHeaderProps {
   onSizeChange: (size: number) => void;
   onThemeChange: (theme: Theme) => void;
   onNewGame: () => void;
+  unlockedThemes?: Theme[];
 }
+
+const ALL_THEMES: Theme[] = ['classic', 'blue', 'fire', 'bubblegum', 'dark'];
 
 const themeButtonStyles: Record<Theme, { bg: string; text: string }> = {
   classic: { bg: '#8f7a66', text: '#f9f6f2' },
@@ -26,6 +29,14 @@ const themeBoxStyles: Record<Theme, { bg: string; text: string }> = {
   dark: { bg: '#222', text: '#ffffff' },
 };
 
+const themeNames: Record<Theme, string> = {
+  classic: 'Classic',
+  blue: 'Blue',
+  fire: 'Fire',
+  bubblegum: 'Bubblegum',
+  dark: 'Dark',
+};
+
 export const GameHeader = ({
   score,
   bestScore,
@@ -34,6 +45,7 @@ export const GameHeader = ({
   onSizeChange,
   onThemeChange,
   onNewGame,
+  unlockedThemes,
 }: GameHeaderProps) => {
   const buttonStyle = themeButtonStyles[theme];
   const boxStyle = themeBoxStyles[theme];
@@ -83,11 +95,11 @@ export const GameHeader = ({
           className="game-select"
           style={{ backgroundColor: boxStyle.bg, color: boxStyle.text }}
         >
-          <option value="classic">Classic</option>
-          <option value="blue">Blue</option>
-          <option value="fire">Fire</option>
-          <option value="bubblegum">Bubblegum</option>
-          <option value="dark">Dark</option>
+          {(unlockedThemes || ALL_THEMES).map((t) => (
+            <option key={t} value={t}>
+              {themeNames[t]}
+            </option>
+          ))}
         </select>
 
         <button

@@ -1,7 +1,7 @@
-import { Game2048 } from '@/components/Game2048';
+import { GameApp } from '@/components/GameApp';
 
 const Index = () => {
-  return <Game2048 />;
+  return <GameApp />;
 };
 
 export default Index;
