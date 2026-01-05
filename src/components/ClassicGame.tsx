@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useGame2048, Theme } from '@/hooks/useGame2048';
 import { GameHeader } from './GameHeader';
@@ -36,14 +36,14 @@ export const ClassicGame = ({
 
   const [showOverlay, setShowOverlay] = useState(false);
 
-  // Show overlay when game is over
-  if ((gameOver || won) && !showOverlay) {
+  // Report game end exactly once per run (avoid render-side effects / double increments)
+  useEffect(() => {
+    if (!(gameOver || won) || showOverlay) return;
+
     setShowOverlay(true);
-    // Report game end
     const highestTile = Math.max(...board.flat());
     onGameEnd(score, highestTile);
-  }
-
+  }, [gameOver, won, showOverlay, board, score, onGameEnd]);
   // Filter themes to only show unlocked ones
   const handleThemeChange = useCallback((newTheme: Theme) => {
     if (unlockedThemes.includes(newTheme)) {
