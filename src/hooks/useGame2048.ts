@@ -1,6 +1,25 @@
 import { useState, useCallback, useEffect } from 'react';
 
-export type Theme = 'classic' | 'blue' | 'fire' | 'bubblegum' | 'dark' | 'forest' | 'sunset' | 'lavender' | 'mint' | 'neon' | 'aurora' | 'cherry' | 'gold' | 'galaxy' | 'rainbow' | 'diamond';
+// Base themes
+export type BaseTheme = 'classic' | 'blue' | 'fire' | 'bubblegum' | 'dark' | 'forest' | 'sunset' | 'lavender' | 'mint' | 'neon' | 'aurora' | 'cherry' | 'gold' | 'galaxy' | 'rainbow' | 'diamond';
+
+// Textured themes
+export type TexturedTheme = 'marble' | 'wood' | 'carbon' | 'crystal' | 'leather' | 'denim' | 'velvet' | 'brushed_metal';
+
+// Seasonal themes
+export type SeasonalTheme = 
+  // Christmas
+  | 'christmas' | 'snow' | 'ice' | 'santa'
+  // Valentine's
+  | 'hearts' | 'rose' | 'cupid' | 'eternal'
+  // Easter
+  | 'easter' | 'bunny' | 'bloom' | 'golden'
+  // Halloween
+  | 'pumpkin' | 'ghost' | 'witch' | 'nightmare'
+  // Hanukkah
+  | 'menorah' | 'dreidel' | 'gelt' | 'miracle';
+
+export type Theme = BaseTheme | TexturedTheme | SeasonalTheme;
 
 interface GameState {
   board: number[][];

@@ -72,28 +72,36 @@ const DAILY_CHALLENGE_POOL: Omit<Challenge, 'expiresAt' | 'current' | 'completed
 ];
 
 const DEFAULT_SHOP_ITEMS: ShopItem[] = [
-  // Common themes (100-200 coins)
-  { id: 'theme_fire', name: 'Fire Theme', description: 'Blazing hot colors', price: 100, type: 'theme', value: 'fire', owned: false, tier: 'common' },
-  { id: 'theme_bubblegum', name: 'Bubblegum', description: 'Sweet pink vibes', price: 100, type: 'theme', value: 'bubblegum', owned: false, tier: 'common' },
-  { id: 'theme_blue', name: 'Ocean', description: 'Cool blue waves', price: 100, type: 'theme', value: 'blue', owned: false, tier: 'common' },
-  { id: 'theme_forest', name: 'Forest', description: 'Natural green tones', price: 150, type: 'theme', value: 'forest', owned: false, tier: 'common' },
+  // Common themes (150-300 coins)
+  { id: 'theme_fire', name: 'Fire Theme', description: 'Blazing hot colors', price: 150, type: 'theme', value: 'fire', owned: false, tier: 'common' },
+  { id: 'theme_bubblegum', name: 'Bubblegum', description: 'Sweet pink vibes', price: 150, type: 'theme', value: 'bubblegum', owned: false, tier: 'common' },
+  { id: 'theme_blue', name: 'Ocean', description: 'Cool blue waves', price: 200, type: 'theme', value: 'blue', owned: false, tier: 'common' },
+  { id: 'theme_forest', name: 'Forest', description: 'Natural green tones', price: 250, type: 'theme', value: 'forest', owned: false, tier: 'common' },
   
-  // Rare themes (250-400 coins)
-  { id: 'theme_dark', name: 'Midnight', description: 'Sleek and mysterious', price: 250, type: 'theme', value: 'dark', owned: false, tier: 'rare' },
-  { id: 'theme_sunset', name: 'Sunset', description: 'Warm evening glow', price: 300, type: 'theme', value: 'sunset', owned: false, tier: 'rare' },
-  { id: 'theme_lavender', name: 'Lavender Dream', description: 'Calming purple hues', price: 300, type: 'theme', value: 'lavender', owned: false, tier: 'rare' },
-  { id: 'theme_mint', name: 'Mint Fresh', description: 'Cool minty freshness', price: 350, type: 'theme', value: 'mint', owned: false, tier: 'rare' },
+  // Rare themes (500-1000 coins)
+  { id: 'theme_dark', name: 'Midnight', description: 'Sleek and mysterious', price: 500, type: 'theme', value: 'dark', owned: false, tier: 'rare' },
+  { id: 'theme_sunset', name: 'Sunset', description: 'Warm evening glow', price: 600, type: 'theme', value: 'sunset', owned: false, tier: 'rare' },
+  { id: 'theme_lavender', name: 'Lavender Dream', description: 'Calming purple hues', price: 700, type: 'theme', value: 'lavender', owned: false, tier: 'rare' },
+  { id: 'theme_mint', name: 'Mint Fresh', description: 'Cool minty freshness', price: 800, type: 'theme', value: 'mint', owned: false, tier: 'rare' },
+  { id: 'theme_wood', name: 'Wood Grain', description: 'Natural wood texture', price: 900, type: 'theme', value: 'wood', owned: false, tier: 'rare' },
+  { id: 'theme_denim', name: 'Denim', description: 'Classic fabric feel', price: 950, type: 'theme', value: 'denim', owned: false, tier: 'rare' },
   
-  // Epic themes (500-800 coins)
-  { id: 'theme_neon', name: 'Neon Nights', description: 'Cyberpunk glow', price: 500, type: 'theme', value: 'neon', owned: false, tier: 'epic' },
-  { id: 'theme_aurora', name: 'Aurora Borealis', description: 'Northern lights magic', price: 600, type: 'theme', value: 'aurora', owned: false, tier: 'epic' },
-  { id: 'theme_cherry', name: 'Cherry Blossom', description: 'Japanese spring beauty', price: 650, type: 'theme', value: 'cherry', owned: false, tier: 'epic' },
-  { id: 'theme_gold', name: 'Royal Gold', description: 'Luxurious golden shine', price: 750, type: 'theme', value: 'gold', owned: false, tier: 'epic' },
+  // Epic themes (1500-3000 coins) - WITH PERKS
+  { id: 'theme_neon', name: 'Neon Nights', description: 'Cyberpunk glow • +5% score bonus', price: 1500, type: 'theme', value: 'neon', owned: false, tier: 'epic' },
+  { id: 'theme_aurora', name: 'Aurora Borealis', description: 'Northern lights • 30% spawn 4', price: 2000, type: 'theme', value: 'aurora', owned: false, tier: 'epic' },
+  { id: 'theme_cherry', name: 'Cherry Blossom', description: 'Japanese spring beauty', price: 2200, type: 'theme', value: 'cherry', owned: false, tier: 'epic' },
+  { id: 'theme_gold', name: 'Royal Gold', description: 'Luxurious shine • 35% spawn 4', price: 2500, type: 'theme', value: 'gold', owned: false, tier: 'epic' },
+  { id: 'theme_leather', name: 'Leather', description: 'Premium leather texture', price: 2800, type: 'theme', value: 'leather', owned: false, tier: 'epic' },
+  { id: 'theme_velvet', name: 'Royal Velvet', description: 'Luxurious velvet feel', price: 3000, type: 'theme', value: 'velvet', owned: false, tier: 'epic' },
   
-  // Legendary themes (1000+ coins)
-  { id: 'theme_galaxy', name: 'Galaxy', description: 'Cosmic star clusters', price: 1000, type: 'theme', value: 'galaxy', owned: false, tier: 'legendary' },
-  { id: 'theme_rainbow', name: 'Rainbow Prism', description: 'All colors combined', price: 1200, type: 'theme', value: 'rainbow', owned: false, tier: 'legendary' },
-  { id: 'theme_diamond', name: 'Diamond', description: 'Ultimate brilliance', price: 1500, type: 'theme', value: 'diamond', owned: false, tier: 'legendary' },
+  // Legendary themes (5000-15000 coins) - POWERFUL PERKS
+  { id: 'theme_galaxy', name: 'Galaxy', description: 'Cosmic clusters • 5% spawn 8!', price: 5000, type: 'theme', value: 'galaxy', owned: false, tier: 'legendary' },
+  { id: 'theme_rainbow', name: 'Rainbow Prism', description: 'All colors • +10% score bonus', price: 7500, type: 'theme', value: 'rainbow', owned: false, tier: 'legendary' },
+  { id: 'theme_diamond', name: 'Diamond', description: 'Ultimate brilliance • 40% spawn 4', price: 10000, type: 'theme', value: 'diamond', owned: false, tier: 'legendary' },
+  { id: 'theme_marble', name: 'Marble Luxe', description: 'Elegant marble • 45% spawn 4', price: 12000, type: 'theme', value: 'marble', owned: false, tier: 'legendary' },
+  { id: 'theme_carbon', name: 'Carbon Fiber', description: 'Racing tech • 8% spawn 8!', price: 15000, type: 'theme', value: 'carbon', owned: false, tier: 'legendary' },
+  { id: 'theme_crystal', name: 'Crystal Clear', description: 'Pure crystal • +15% score bonus', price: 20000, type: 'theme', value: 'crystal', owned: false, tier: 'legendary' },
+  { id: 'theme_brushed_metal', name: 'Brushed Metal', description: 'Industrial premium', price: 8000, type: 'theme', value: 'brushed_metal', owned: false, tier: 'legendary' },
 ];
 
 const STORAGE_KEY = '2048-game-store';

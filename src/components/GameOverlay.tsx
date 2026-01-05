@@ -1,4 +1,5 @@
 import type { Theme } from '@/hooks/useGame2048';
+import { getThemeButtonStyle } from '@/hooks/useThemeData';
 
 interface GameOverlayProps {
   show: boolean;
@@ -9,29 +10,10 @@ interface GameOverlayProps {
   onClose: () => void;
 }
 
-const themeButtonStyles: Record<Theme, { bg: string; text: string }> = {
-  classic: { bg: '#8f7a66', text: '#f9f6f2' },
-  blue: { bg: '#44445e', text: '#ffffff' },
-  fire: { bg: '#ff1a1a', text: '#f9f6f2' },
-  bubblegum: { bg: '#ff4da6', text: '#ffffff' },
-  dark: { bg: '#111', text: '#ffffff' },
-  forest: { bg: '#228b22', text: '#ffffff' },
-  sunset: { bg: '#ff6b35', text: '#ffffff' },
-  lavender: { bg: '#9b59b6', text: '#ffffff' },
-  mint: { bg: '#3eb489', text: '#ffffff' },
-  neon: { bg: '#ff00ff', text: '#00ffff' },
-  aurora: { bg: '#2ecc71', text: '#ffffff' },
-  cherry: { bg: '#ff69b4', text: '#ffffff' },
-  gold: { bg: '#ffd700', text: '#1a1a1a' },
-  galaxy: { bg: '#2c1654', text: '#ffffff' },
-  rainbow: { bg: '#ff0000', text: '#ffffff' },
-  diamond: { bg: '#b9f2ff', text: '#1a1a1a' },
-};
-
 export const GameOverlay = ({ show, score, won, theme, onNewGame, onClose }: GameOverlayProps) => {
   if (!show) return null;
 
-  const buttonStyle = themeButtonStyles[theme];
+  const buttonStyle = getThemeButtonStyle(theme);
 
   return (
     <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl z-10">
