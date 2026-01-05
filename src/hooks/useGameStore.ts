@@ -98,6 +98,10 @@ const DEFAULT_SHOP_ITEMS: ShopItem[] = [
 
 const STORAGE_KEY = '2048-game-store';
 
+const toSafeInt = (value: unknown, fallback = 0) => {
+  const n = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(n) ? Math.floor(n) : fallback;
+};
 const generateDailyChallenges = (): Challenge[] => {
   const shuffled = [...DAILY_CHALLENGE_POOL].sort(() => Math.random() - 0.5);
   const selected = shuffled.slice(0, 3);
@@ -151,47 +155,62 @@ export const useGameStore = () => {
   const [store, setStore] = useState<GameStore>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     const now = Date.now();
-    
+
     if (saved) {
       const parsed = JSON.parse(saved);
-      
+
+      const parsedCoins = toSafeInt(parsed.coins, 0);
+      const parsedCompetitivePlays = toSafeInt(parsed.competitivePlays, 0);
+      const parsedGamesPlayed = toSafeInt(parsed.gamesPlayed, 0);
+      const parsedHighestTile = toSafeInt(parsed.highestTile, 0);
+      const parsedBestClassicScore = toSafeInt(parsed.bestClassicScore, 0);
+      const parsedBestCompetitiveScore = toSafeInt(parsed.bestCompetitiveScore, 0);
+      const parsedLastDailyReset = toSafeInt(parsed.lastDailyReset, now);
+
       // Check if daily challenges need reset
-      const needsDailyReset = !parsed.lastDailyReset || 
-        new Date(parsed.lastDailyReset).toDateString() !== new Date().toDateString();
-      
-      const dailyChallenges = needsDailyReset 
-        ? generateDailyChallenges() 
+      const needsDailyReset =
+        !parsedLastDailyReset ||
+        new Date(parsedLastDailyReset).toDateString() !== new Date().toDateString();
+
+      const dailyChallenges = needsDailyReset
+        ? generateDailyChallenges()
         : (parsed.dailyChallenges || generateDailyChallenges());
-      
+
       // Merge with defaults to handle new challenges and sync progress
-      const mergedChallenges = DEFAULT_CHALLENGES.map(dc => {
+      const mergedChallenges = DEFAULT_CHALLENGES.map((dc) => {
         const existing = parsed.challenges?.find((c: Challenge) => c.id === dc.id);
         return existing || dc;
       });
-      
+
       // Sync challenge progress with actual counters
       const syncedChallenges = syncChallengeProgress(
         mergedChallenges,
-        parsed.gamesPlayed || 0,
-        parsed.competitivePlays || 0,
-        parsed.highestTile || 0,
-        Math.max(parsed.bestClassicScore || 0, parsed.bestCompetitiveScore || 0)
+        parsedGamesPlayed,
+        parsedCompetitivePlays,
+        parsedHighestTile,
+        Math.max(parsedBestClassicScore, parsedBestCompetitiveScore)
       );
-      
-      const mergedShopItems = DEFAULT_SHOP_ITEMS.map(di => {
+
+      const mergedShopItems = DEFAULT_SHOP_ITEMS.map((di) => {
         const existing = parsed.shopItems?.find((i: ShopItem) => i.id === di.id);
         return existing ? { ...di, owned: existing.owned } : di;
       });
-      
+
       return {
         ...parsed,
+        coins: parsedCoins,
+        competitivePlays: parsedCompetitivePlays,
+        gamesPlayed: parsedGamesPlayed,
+        highestTile: parsedHighestTile,
+        bestClassicScore: parsedBestClassicScore,
+        bestCompetitiveScore: parsedBestCompetitiveScore,
         challenges: syncedChallenges,
         dailyChallenges,
         shopItems: mergedShopItems,
-        lastDailyReset: needsDailyReset ? now : parsed.lastDailyReset,
+        lastDailyReset: needsDailyReset ? now : parsedLastDailyReset,
       };
     }
-    
+
     return {
       coins: 0,
       unlockedThemes: ['classic'] as Theme[],
@@ -267,13 +286,14 @@ export const useGameStore = () => {
 
   const updateProgress = useCallback((score: number, highestTile: number, isCompetitive: boolean) => {
     setStore(prev => {
-      const newGamesPlayed = prev.gamesPlayed + 1;
-      const newCompetitivePlays = isCompetitive ? prev.competitivePlays + 1 : prev.competitivePlays;
-      const newHighestTile = Math.max(prev.highestTile, highestTile);
-      const newBestClassic = !isCompetitive ? Math.max(prev.bestClassicScore, score) : prev.bestClassicScore;
-      const newBestCompetitive = isCompetitive ? Math.max(prev.bestCompetitiveScore, score) : prev.bestCompetitiveScore;
-      const bestScore = Math.max(newBestClassic, newBestCompetitive);
+      const prevGamesPlayed = toSafeInt(prev.gamesPlayed, 0);
+      const prevCompetitivePlays = toSafeInt(prev.competitivePlays, 0);
 
+      const newGamesPlayed = prevGamesPlayed + 1;
+      const newCompetitivePlays = isCompetitive ? prevCompetitivePlays + 1 : prevCompetitivePlays;
+      const newHighestTile = Math.max(toSafeInt(prev.highestTile, 0), highestTile);
+      const newBestClassic = !isCompetitive ? Math.max(toSafeInt(prev.bestClassicScore, 0), score) : toSafeInt(prev.bestClassicScore, 0);
+      const newBestCompetitive = isCompetitive ? Math.max(toSafeInt(prev.bestCompetitiveScore, 0), score) : toSafeInt(prev.bestCompetitiveScore, 0);
       const updatedChallenges = prev.challenges.map(c => {
         if (c.claimed) return c;
         
