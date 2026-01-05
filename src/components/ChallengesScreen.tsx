@@ -1,4 +1,5 @@
-import { ArrowLeft, Coins, Check, Lock, Clock, Star, Trophy } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Coins, Check, Lock, Clock, Star, Trophy, RotateCcw } from 'lucide-react';
 import { Challenge } from '@/hooks/useGameStore';
 
 interface ChallengesScreenProps {
@@ -6,9 +7,11 @@ interface ChallengesScreenProps {
   dailyChallenges: Challenge[];
   onClaimReward: (id: string, isDaily: boolean) => void;
   onBack: () => void;
+  onResetProgress?: () => void;
 }
 
-export const ChallengesScreen = ({ challenges, dailyChallenges, onClaimReward, onBack }: ChallengesScreenProps) => {
+export const ChallengesScreen = ({ challenges, dailyChallenges, onClaimReward, onBack, onResetProgress }: ChallengesScreenProps) => {
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const sortChallenges = (list: Challenge[]) => [...list].sort((a, b) => {
     if (a.claimed && !b.claimed) return 1;
     if (!a.claimed && b.claimed) return -1;
@@ -143,7 +146,49 @@ export const ChallengesScreen = ({ challenges, dailyChallenges, onClaimReward, o
             ))}
           </div>
         </div>
+
+        {/* Reset Progress */}
+        {onResetProgress && (
+          <div className="mt-8 pt-6 border-t border-white/20">
+            <button
+              onClick={() => setShowResetConfirm(true)}
+              className="w-full flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 py-3 rounded-xl font-bold transition-colors"
+            >
+              <RotateCcw className="w-5 h-5" />
+              Reset All Progress
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-2">Reset Progress?</h3>
+            <p className="text-white/70 mb-6">
+              This will erase all coins, unlocked themes, and challenge progress. This cannot be undone!
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="flex-1 bg-white/20 text-white py-3 rounded-xl font-bold hover:bg-white/30 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onResetProgress();
+                  setShowResetConfirm(false);
+                }}
+                className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-colors"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

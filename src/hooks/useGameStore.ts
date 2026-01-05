@@ -379,6 +379,23 @@ export const useGameStore = () => {
     return challenge.reward;
   }, [store.challenges, store.dailyChallenges]);
 
+  const resetProgress = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setStore({
+      coins: 0,
+      unlockedThemes: ['classic'] as Theme[],
+      challenges: DEFAULT_CHALLENGES,
+      dailyChallenges: generateDailyChallenges(),
+      shopItems: DEFAULT_SHOP_ITEMS,
+      competitivePlays: 0,
+      gamesPlayed: 0,
+      highestTile: 0,
+      bestClassicScore: 0,
+      bestCompetitiveScore: 0,
+      lastDailyReset: Date.now(),
+    });
+  }, []);
+
   return {
     ...store,
     addCoins,
@@ -387,5 +404,6 @@ export const useGameStore = () => {
     purchaseItem,
     updateProgress,
     claimReward,
+    resetProgress,
   };
 };

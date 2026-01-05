@@ -79,6 +79,7 @@ export const GameApp = () => {
             dailyChallenges={store.dailyChallenges}
             onClaimReward={handleClaimReward}
             onBack={() => setCurrentScreen('home')}
+            onResetProgress={store.resetProgress}
           />
         );
       case 'shop':
