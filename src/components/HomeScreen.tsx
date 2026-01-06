@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Coins, Trophy, ShoppingBag, Gamepad2, Timer, Sparkles } from 'lucide-react';
+import { Coins, Trophy, ShoppingBag, Gamepad2, Timer, Sparkles, Calendar } from 'lucide-react';
 
 interface HomeScreenProps {
   coins: number;
+  hasActiveSeasons: boolean;
   onPlayClassic: () => void;
   onPlayCompetitive: () => void;
   onOpenChallenges: () => void;
   onOpenShop: () => void;
+  onOpenSeasons: () => void;
 }
 
 export const HomeScreen = ({ 
-  coins, 
+  coins,
+  hasActiveSeasons,
   onPlayClassic, 
   onPlayCompetitive, 
   onOpenChallenges, 
-  onOpenShop 
+  onOpenShop,
+  onOpenSeasons,
 }: HomeScreenProps) => {
   const [floatingTiles, setFloatingTiles] = useState<{ id: number; value: number; x: number; delay: number }[]>([]);
 
@@ -106,6 +110,27 @@ export const HomeScreen = ({
               </div>
             </div>
           </button>
+
+          {/* Seasons - Only show if active */}
+          {hasActiveSeasons && (
+            <button
+              onClick={onOpenSeasons}
+              className="w-full group relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 via-red-500 to-pink-500 p-1 transition-all duration-300 hover:scale-105 hover:shadow-2xl animate-pulse-subtle"
+            >
+              <div className="flex items-center gap-4 rounded-xl bg-gradient-to-r from-amber-400 via-red-500 to-pink-500 px-6 py-5">
+                <div className="bg-white/20 p-3 rounded-xl">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="text-2xl font-black text-white">Seasons</h3>
+                  <p className="text-white/70 text-sm">Limited-time events & themes!</p>
+                </div>
+                <div className="bg-yellow-300 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold animate-bounce">
+                  NEW!
+                </div>
+              </div>
+            </button>
+          )}
 
           {/* Challenges */}
           <button
