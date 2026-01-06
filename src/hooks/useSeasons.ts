@@ -58,7 +58,7 @@ export const ALL_SEASONS: Season[] = [
     name: 'Winter Wonderland',
     emoji: '🎄',
     startDate: '2025-12-15',
-    endDate: '2026-01-05',
+    endDate: '2026-01-15',
     description: 'Celebrate the holidays with festive themes and snowy challenges!',
     gradientFrom: '#1e3a5f',
     gradientTo: '#7b1e34',

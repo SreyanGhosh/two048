@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { calculateSpawnValue, calculateBonusScore } from './useThemePerks';
 
 // Base themes
 export type BaseTheme = 'classic' | 'blue' | 'fire' | 'bubblegum' | 'dark' | 'forest' | 'sunset' | 'lavender' | 'mint' | 'neon' | 'aurora' | 'cherry' | 'gold' | 'galaxy' | 'rainbow' | 'diamond';
@@ -46,11 +47,21 @@ const getEmptyCells = (board: number[][]): [number, number][] => {
   return empty;
 };
 
+// Default random tile (no theme perks)
 const addRandomTile = (board: number[][]): [number, number] | null => {
   const empty = getEmptyCells(board);
   if (empty.length === 0) return null;
   const [r, c] = empty[Math.floor(Math.random() * empty.length)];
   board[r][c] = Math.random() < 0.75 ? 2 : 4;
+  return [r, c];
+};
+
+// Random tile with theme perk support
+const addRandomTileWithPerk = (board: number[][], theme: Theme): [number, number] | null => {
+  const empty = getEmptyCells(board);
+  if (empty.length === 0) return null;
+  const [r, c] = empty[Math.floor(Math.random() * empty.length)];
+  board[r][c] = calculateSpawnValue(theme);
   return [r, c];
 };
 
@@ -153,7 +164,8 @@ export const useGame2048 = (initialSize: number = 4) => {
         const input = reverse ? [...row].reverse() : row;
         const { newRow, score, merged } = slide(input);
         const result = reverse ? newRow.reverse() : newRow;
-        totalScore += score;
+        // Apply bonus score perk
+        totalScore += calculateBonusScore(prev.theme, score);
         
         merged.forEach(idx => {
           const actualIdx = reverse ? row.length - 1 - idx : idx;
@@ -194,7 +206,8 @@ export const useGame2048 = (initialSize: number = 4) => {
         return prev;
       }
 
-      const newTilePos = addRandomTile(newBoard);
+      // Use theme perks for spawn value
+      const newTilePos = addRandomTileWithPerk(newBoard, prev.theme);
       const newTiles = new Set<string>();
       if (newTilePos) newTiles.add(`${newTilePos[0]}-${newTilePos[1]}`);
 
