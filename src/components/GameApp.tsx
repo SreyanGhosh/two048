@@ -2,28 +2,32 @@ import { useState, useCallback, useEffect } from 'react';
 import { Theme } from '@/hooks/useGame2048';
 import { useGameStore } from '@/hooks/useGameStore';
 import { useSeasons, Season, SeasonalChallenge } from '@/hooks/useSeasons';
-import { HomeScreen } from './HomeScreen';
+import { useGems, Pack, NORMAL_PACKS, ThemeRank } from '@/hooks/useGems';
+import { FCHomeScreen } from './FCHomeScreen';
 import { ClassicGame } from './ClassicGame';
 import { CompetitiveGame } from './CompetitiveGame';
-import { ChallengesScreen } from './ChallengesScreen';
-import { ShopScreen } from './ShopScreen';
+import { QuestsScreen } from './QuestsScreen';
+import { MarketScreen } from './MarketScreen';
+import { StoreScreen } from './StoreScreen';
+import { InventoryScreen } from './InventoryScreen';
 import { SeasonsScreen } from './SeasonsScreen';
 import { SeasonShop } from './SeasonShop';
 import { SeasonWelcomePopup } from './SeasonWelcomePopup';
 import { SeasonalChallengeGame } from './SeasonalChallengeGame';
+import { getThemeName } from '@/hooks/useThemeData';
 import { toast } from 'sonner';
 
-type Screen = 'home' | 'classic' | 'competitive' | 'challenges' | 'shop' | 'seasons' | 'season-shop' | 'season-challenge';
+type Screen = 'home' | 'classic' | 'competitive' | 'quests' | 'market' | 'store' | 'inventory' | 'seasons' | 'season-shop' | 'season-challenge';
 
 export const GameApp = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
-  const [selectedTheme, setSelectedTheme] = useState<Theme>('classic');
   const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
   const [selectedChallenge, setSelectedChallenge] = useState<SeasonalChallenge | null>(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState<Season | null>(null);
 
   const store = useGameStore();
   const seasons = useSeasons();
+  const gems = useGems();
 
   // Check for new season welcome popup
   useEffect(() => {
@@ -39,38 +43,85 @@ export const GameApp = () => {
   const handleAcceptWelcome = useCallback(() => {
     if (showWelcomePopup) {
       seasons.initializeSeason(showWelcomePopup.id);
+      // Also add the base theme to gems inventory
+      const baseTheme = showWelcomePopup.themes[0];
+      if (baseTheme) {
+        gems.addTheme(baseTheme.themeValue, 'base');
+      }
       toast.success(`Welcome to ${showWelcomePopup.name}!`, {
         description: `You received ${showWelcomePopup.starterCredits} season credits and the ${showWelcomePopup.themes[0]?.name} theme!`,
         icon: showWelcomePopup.emoji,
       });
       setShowWelcomePopup(null);
     }
-  }, [showWelcomePopup, seasons]);
+  }, [showWelcomePopup, seasons, gems]);
 
   const handleGameEnd = useCallback((score: number, highestTile: number, isCompetitive: boolean) => {
     store.updateProgress(score, highestTile, isCompetitive);
-  }, [store]);
+    // Award gems based on score
+    const gemsEarned = Math.floor(score / 500);
+    if (gemsEarned > 0) {
+      gems.addGems(gemsEarned);
+      toast.success(`+${gemsEarned} gems earned!`, { icon: '💎' });
+    }
+  }, [store, gems]);
 
   const handleClaimReward = useCallback((id: string, isDaily: boolean = false) => {
     const reward = store.claimReward(id, isDaily);
     if (reward > 0) {
-      toast.success(`+${reward} coins earned!`, {
-        icon: '🪙',
-      });
+      toast.success(`+${reward} coins earned!`, { icon: '🪙' });
+      // Also give some gems
+      const gemsReward = Math.floor(reward / 10);
+      if (gemsReward > 0) {
+        gems.addGems(gemsReward);
+      }
     }
-  }, [store]);
+  }, [store, gems]);
 
-  const handlePurchase = useCallback((id: string) => {
-    const success = store.purchaseItem(id);
-    if (success) {
-      toast.success('Item purchased!', {
-        icon: '🎉',
-      });
-    } else {
+  const handlePurchase = useCallback((id: string, rank?: ThemeRank) => {
+    const item = store.shopItems.find(i => i.id === id);
+    if (!item) return false;
+    
+    const multiplier = rank === 'green' ? 2.5 : rank === 'blue' ? 6 : 1;
+    const price = Math.floor(item.price * multiplier);
+    
+    if (store.coins < price) {
       toast.error('Not enough coins!');
+      return false;
     }
-    return success;
-  }, [store]);
+    
+    store.spendCoins(price);
+    gems.addTheme(item.value as Theme, rank || 'base');
+    toast.success('Theme purchased!', { icon: '🎉' });
+    return true;
+  }, [store, gems]);
+
+  const handleOpenPack = useCallback((pack: Pack): Theme[] => {
+    if (!gems.spendGems(pack.price)) {
+      toast.error('Not enough gems!');
+      return [];
+    }
+
+    // Generate random themes from pack
+    const themes: Theme[] = [];
+    const numThemes = pack.id.includes('legendary') ? 5 : pack.id.includes('epic') ? 4 : 3;
+    
+    for (let i = 0; i < numThemes; i++) {
+      const totalWeight = pack.possibleThemes.reduce((sum, t) => sum + t.weight, 0);
+      let random = Math.random() * totalWeight;
+      
+      for (const themeOption of pack.possibleThemes) {
+        random -= themeOption.weight;
+        if (random <= 0) {
+          themes.push(themeOption.theme);
+          gems.addTheme(themeOption.theme, 'base');
+          break;
+        }
+      }
+    }
+
+    return themes;
+  }, [gems]);
 
   const handlePlayChallenge = useCallback((season: Season, challenge: SeasonalChallenge) => {
     if (!seasons.canPlayChallengeToday(season.id)) {
@@ -91,57 +142,70 @@ export const GameApp = () => {
   const handleClaimSeasonReward = useCallback((seasonId: string, challengeId: string) => {
     const rewards = seasons.claimChallengeReward(seasonId, challengeId);
     if (rewards) {
-      if (rewards.coins > 0) {
-        store.addCoins(rewards.coins);
+      if (rewards.coins > 0) store.addCoins(rewards.coins);
+      if (rewards.seasonCredits > 0) gems.addGems(Math.floor(rewards.seasonCredits / 5));
+      if (rewards.themeId) {
+        const season = seasons.allSeasons.find(s => s.id === seasonId);
+        const theme = season?.themes.find(t => t.id === rewards.themeId);
+        if (theme) gems.addTheme(theme.themeValue, 'base');
       }
-      const messages = [];
-      if (rewards.seasonCredits > 0) messages.push(`+${rewards.seasonCredits} season credits`);
-      if (rewards.coins > 0) messages.push(`+${rewards.coins} coins`);
-      if (rewards.themeId) messages.push('New theme unlocked!');
-      
-      toast.success('Rewards claimed!', {
-        description: messages.join(' • '),
-        icon: '🎁',
-      });
+      toast.success('Rewards claimed!', { icon: '🎁' });
     }
-  }, [seasons, store]);
+  }, [seasons, store, gems]);
 
   const handleSeasonPurchase = useCallback((seasonId: string, themeId: string) => {
     const success = seasons.purchaseSeasonTheme(seasonId, themeId);
     if (success) {
-      toast.success('Theme purchased!', {
-        icon: '🎨',
-      });
+      const season = seasons.allSeasons.find(s => s.id === seasonId);
+      const theme = season?.themes.find(t => t.id === themeId);
+      if (theme) gems.addTheme(theme.themeValue, 'base');
+      toast.success('Theme purchased!', { icon: '🎨' });
     } else {
       toast.error('Not enough season credits!');
     }
     return success;
-  }, [seasons]);
+  }, [seasons, gems]);
 
   const handleOpenSeasonShop = useCallback((season: Season) => {
     setSelectedSeason(season);
     setCurrentScreen('season-shop');
   }, []);
 
+  // Get seasonal packs for store
+  const seasonalPacks: Pack[] = seasons.activeSeasons.map(season => ({
+    id: `${season.id}_pack`,
+    name: `${season.name} Pack`,
+    description: `3 ${season.name} themes`,
+    price: 150,
+    type: 'seasonal' as const,
+    seasonId: season.id,
+    possibleThemes: season.themes.map(t => ({ theme: t.themeValue, weight: t.tier === 'legendary' ? 5 : t.tier === 'epic' ? 10 : 20 })),
+  }));
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
         return (
-          <HomeScreen
+          <FCHomeScreen
             coins={store.coins}
+            gems={gems.gems}
             hasActiveSeasons={seasons.activeSeasons.length > 0}
+            activeSeason={seasons.activeSeasons[0]}
+            equippedThemeName={getThemeName(gems.equippedTheme)}
             onPlayClassic={() => setCurrentScreen('classic')}
             onPlayCompetitive={() => setCurrentScreen('competitive')}
-            onOpenChallenges={() => setCurrentScreen('challenges')}
-            onOpenShop={() => setCurrentScreen('shop')}
+            onOpenQuests={() => setCurrentScreen('quests')}
+            onOpenMarket={() => setCurrentScreen('market')}
+            onOpenStore={() => setCurrentScreen('store')}
             onOpenSeasons={() => setCurrentScreen('seasons')}
+            onOpenInventory={() => setCurrentScreen('inventory')}
           />
         );
       case 'classic':
         return (
           <ClassicGame
-            initialTheme={selectedTheme}
-            unlockedThemes={store.unlockedThemes}
+            initialTheme={gems.equippedTheme}
+            unlockedThemes={gems.ownedThemes.map(t => t.themeId)}
             onBack={() => setCurrentScreen('home')}
             onGameEnd={(score, tile) => handleGameEnd(score, tile, false)}
           />
@@ -149,16 +213,16 @@ export const GameApp = () => {
       case 'competitive':
         return (
           <CompetitiveGame
-            theme={selectedTheme}
-            unlockedThemes={store.unlockedThemes}
+            theme={gems.equippedTheme}
+            unlockedThemes={gems.ownedThemes.map(t => t.themeId)}
             onBack={() => setCurrentScreen('home')}
             onGameEnd={(score, tile) => handleGameEnd(score, tile, true)}
             bestScore={store.bestCompetitiveScore}
           />
         );
-      case 'challenges':
+      case 'quests':
         return (
-          <ChallengesScreen
+          <QuestsScreen
             challenges={store.challenges}
             dailyChallenges={store.dailyChallenges}
             onClaimReward={handleClaimReward}
@@ -166,13 +230,33 @@ export const GameApp = () => {
             onResetProgress={store.resetProgress}
           />
         );
-      case 'shop':
+      case 'market':
         return (
-          <ShopScreen
+          <MarketScreen
             coins={store.coins}
             items={store.shopItems}
             onPurchase={handlePurchase}
             onBack={() => setCurrentScreen('home')}
+          />
+        );
+      case 'store':
+        return (
+          <StoreScreen
+            gems={gems.gems}
+            seasonalPacks={seasonalPacks}
+            onBack={() => setCurrentScreen('home')}
+            onOpenPack={handleOpenPack}
+          />
+        );
+      case 'inventory':
+        return (
+          <InventoryScreen
+            ownedThemes={gems.ownedThemes}
+            equippedTheme={gems.equippedTheme}
+            equippedRank={gems.equippedRank}
+            onBack={() => setCurrentScreen('home')}
+            onEquip={gems.equipTheme}
+            onMerge={gems.mergeThemes}
           />
         );
       case 'seasons':
@@ -223,8 +307,6 @@ export const GameApp = () => {
   return (
     <>
       {renderScreen()}
-      
-      {/* Season Welcome Popup */}
       {showWelcomePopup && (
         <SeasonWelcomePopup
           season={showWelcomePopup}
