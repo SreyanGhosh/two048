@@ -143,6 +143,7 @@ export const GameApp = () => {
     const rewards = seasons.claimChallengeReward(seasonId, challengeId);
     if (rewards) {
       if (rewards.coins > 0) store.addCoins(rewards.coins);
+      if (rewards.gems > 0) gems.addGems(rewards.gems);
       if (rewards.seasonCredits > 0) gems.addGems(Math.floor(rewards.seasonCredits / 5));
       if (rewards.themeId) {
         const season = seasons.allSeasons.find(s => s.id === seasonId);
@@ -189,8 +190,7 @@ export const GameApp = () => {
           <FCHomeScreen
             coins={store.coins}
             gems={gems.gems}
-            hasActiveSeasons={seasons.activeSeasons.length > 0}
-            activeSeason={seasons.activeSeasons[0]}
+            activeSeasons={seasons.activeSeasons}
             equippedThemeName={getThemeName(gems.equippedTheme)}
             onPlayClassic={() => setCurrentScreen('classic')}
             onPlayCompetitive={() => setCurrentScreen('competitive')}

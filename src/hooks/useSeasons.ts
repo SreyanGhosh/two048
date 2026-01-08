@@ -20,6 +20,7 @@ export interface SeasonalChallenge {
   rewards: {
     seasonCredits?: number;
     coins?: number;
+    gems?: number;
     themeId?: string;
   };
   completed: boolean;
@@ -51,14 +52,45 @@ export interface SeasonProgress {
   welcomeShown: boolean;
 }
 
-// Define all seasons
+// Define all seasons - seasons can overlap!
 export const ALL_SEASONS: Season[] = [
+  // New Year's 2026 - overlaps with Christmas
   {
-    id: 'christmas_2026',
+    id: 'newyear_2026',
+    name: 'New Year Celebration',
+    emoji: '🎆',
+    startDate: '2025-12-28',
+    endDate: '2026-01-15',
+    description: 'Ring in the new year with sparkly themes and fresh starts!',
+    gradientFrom: '#1a1a3e',
+    gradientTo: '#ffd700',
+    baseThemeId: 'newyear_base',
+    starterCredits: 60,
+    themes: [
+      { id: 'newyear_base', name: 'Midnight Glow', description: 'New year sparkles', price: 0, tier: 'base', themeValue: 'newyear' as Theme },
+      { id: 'newyear_firework', name: 'Fireworks', description: 'Explosive colors', price: 100, tier: 'rare', themeValue: 'firework' as Theme },
+      { id: 'newyear_champagne', name: 'Champagne Pop', description: 'Bubbly celebration', price: 250, tier: 'epic', themeValue: 'champagne' as Theme },
+      { id: 'newyear_countdown', name: 'Countdown', description: 'The final moments', price: 500, tier: 'legendary', themeValue: 'countdown' as Theme },
+    ],
+    challenges: [
+      { id: 'ny_1', title: 'Fresh Start', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50, gems: 5 }, completed: false, claimed: false },
+      { id: 'ny_2', title: 'Resolution', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50, gems: 10 }, completed: false, claimed: false },
+      { id: 'ny_3', title: 'First Steps', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100, gems: 15 }, completed: false, claimed: false },
+      { id: 'ny_4', title: 'Momentum', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'newyear_firework', gems: 20 }, completed: false, claimed: false },
+      { id: 'ny_5', title: 'Sparks Fly', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150, gems: 25 }, completed: false, claimed: false },
+      { id: 'ny_6', title: 'Champagne', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150, gems: 30 }, completed: false, claimed: false },
+      { id: 'ny_7', title: 'Fireworks', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'newyear_champagne', gems: 40 }, completed: false, claimed: false },
+      { id: 'ny_8', title: 'Midnight', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500, gems: 50 }, completed: false, claimed: false },
+      { id: 'ny_9', title: 'Countdown', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500, gems: 75 }, completed: false, claimed: false },
+      { id: 'ny_10', title: 'Happy 2026!', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'newyear_countdown', coins: 1000, gems: 100 }, completed: false, claimed: false },
+    ],
+  },
+  {
+    id: 'christmas_2025',
     name: 'Winter Wonderland',
     emoji: '🎄',
     startDate: '2025-12-15',
-    endDate: '2026-01-15',
+    endDate: '2026-01-10',
     description: 'Celebrate the holidays with festive themes and snowy challenges!',
     gradientFrom: '#1e3a5f',
     gradientTo: '#7b1e34',
@@ -71,16 +103,16 @@ export const ALL_SEASONS: Season[] = [
       { id: 'christmas_santa', name: 'Santa\'s Workshop', description: 'North Pole magic', price: 500, tier: 'legendary', themeValue: 'santa' as Theme },
     ],
     challenges: [
-      { id: 'xmas_1', title: 'Warm Up', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50 }, completed: false, claimed: false },
-      { id: 'xmas_2', title: 'Cozy Fire', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50 }, completed: false, claimed: false },
-      { id: 'xmas_3', title: 'Snow Flurry', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100 }, completed: false, claimed: false },
-      { id: 'xmas_4', title: 'Ice Storm', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'christmas_snow' }, completed: false, claimed: false },
-      { id: 'xmas_5', title: 'Blizzard', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150 }, completed: false, claimed: false },
-      { id: 'xmas_6', title: 'Frozen Lake', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150 }, completed: false, claimed: false },
-      { id: 'xmas_7', title: 'North Star', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'christmas_ice' }, completed: false, claimed: false },
-      { id: 'xmas_8', title: 'Miracle', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500 }, completed: false, claimed: false },
-      { id: 'xmas_9', title: 'Holiday Magic', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500 }, completed: false, claimed: false },
-      { id: 'xmas_10', title: 'Santa\'s Gift', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'christmas_santa', coins: 1000 }, completed: false, claimed: false },
+      { id: 'xmas_1', title: 'Warm Up', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50, gems: 5 }, completed: false, claimed: false },
+      { id: 'xmas_2', title: 'Cozy Fire', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50, gems: 10 }, completed: false, claimed: false },
+      { id: 'xmas_3', title: 'Snow Flurry', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100, gems: 15 }, completed: false, claimed: false },
+      { id: 'xmas_4', title: 'Ice Storm', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'christmas_snow', gems: 20 }, completed: false, claimed: false },
+      { id: 'xmas_5', title: 'Blizzard', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150, gems: 25 }, completed: false, claimed: false },
+      { id: 'xmas_6', title: 'Frozen Lake', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150, gems: 30 }, completed: false, claimed: false },
+      { id: 'xmas_7', title: 'North Star', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'christmas_ice', gems: 40 }, completed: false, claimed: false },
+      { id: 'xmas_8', title: 'Miracle', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500, gems: 50 }, completed: false, claimed: false },
+      { id: 'xmas_9', title: 'Holiday Magic', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500, gems: 75 }, completed: false, claimed: false },
+      { id: 'xmas_10', title: 'Santa\'s Gift', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'christmas_santa', coins: 1000, gems: 100 }, completed: false, claimed: false },
     ],
   },
   {
@@ -101,16 +133,16 @@ export const ALL_SEASONS: Season[] = [
       { id: 'valentines_eternal', name: 'Eternal Love', description: 'Everlasting passion', price: 500, tier: 'legendary', themeValue: 'eternal' as Theme },
     ],
     challenges: [
-      { id: 'val_1', title: 'First Crush', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50 }, completed: false, claimed: false },
-      { id: 'val_2', title: 'Sweet Kiss', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50 }, completed: false, claimed: false },
-      { id: 'val_3', title: 'Love Letter', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100 }, completed: false, claimed: false },
-      { id: 'val_4', title: 'Heartbeat', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'valentines_rose' }, completed: false, claimed: false },
-      { id: 'val_5', title: 'Roses', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150 }, completed: false, claimed: false },
-      { id: 'val_6', title: 'Chocolate', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150 }, completed: false, claimed: false },
-      { id: 'val_7', title: 'Cupid', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'valentines_cupid' }, completed: false, claimed: false },
-      { id: 'val_8', title: 'Proposal', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500 }, completed: false, claimed: false },
-      { id: 'val_9', title: 'Wedding', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500 }, completed: false, claimed: false },
-      { id: 'val_10', title: 'Forever', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'valentines_eternal', coins: 1000 }, completed: false, claimed: false },
+      { id: 'val_1', title: 'First Crush', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50, gems: 5 }, completed: false, claimed: false },
+      { id: 'val_2', title: 'Sweet Kiss', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50, gems: 10 }, completed: false, claimed: false },
+      { id: 'val_3', title: 'Love Letter', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100, gems: 15 }, completed: false, claimed: false },
+      { id: 'val_4', title: 'Heartbeat', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'valentines_rose', gems: 20 }, completed: false, claimed: false },
+      { id: 'val_5', title: 'Roses', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150, gems: 25 }, completed: false, claimed: false },
+      { id: 'val_6', title: 'Chocolate', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150, gems: 30 }, completed: false, claimed: false },
+      { id: 'val_7', title: 'Cupid', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'valentines_cupid', gems: 40 }, completed: false, claimed: false },
+      { id: 'val_8', title: 'Proposal', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500, gems: 50 }, completed: false, claimed: false },
+      { id: 'val_9', title: 'Wedding', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500, gems: 75 }, completed: false, claimed: false },
+      { id: 'val_10', title: 'Forever', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'valentines_eternal', coins: 1000, gems: 100 }, completed: false, claimed: false },
     ],
   },
   {
@@ -131,16 +163,16 @@ export const ALL_SEASONS: Season[] = [
       { id: 'easter_golden', name: 'Golden Egg', description: 'The legendary prize', price: 500, tier: 'legendary', themeValue: 'golden' as Theme },
     ],
     challenges: [
-      { id: 'easter_1', title: 'Egg Hunt', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50 }, completed: false, claimed: false },
-      { id: 'easter_2', title: 'Basket', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50 }, completed: false, claimed: false },
-      { id: 'easter_3', title: 'Bunny Trail', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100 }, completed: false, claimed: false },
-      { id: 'easter_4', title: 'Chocolate Egg', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'easter_bunny' }, completed: false, claimed: false },
-      { id: 'easter_5', title: 'Spring Rain', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150 }, completed: false, claimed: false },
-      { id: 'easter_6', title: 'Flower Field', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150 }, completed: false, claimed: false },
-      { id: 'easter_7', title: 'Bloom', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'easter_bloom' }, completed: false, claimed: false },
-      { id: 'easter_8', title: 'Rainbow', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500 }, completed: false, claimed: false },
-      { id: 'easter_9', title: 'Miracle', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500 }, completed: false, claimed: false },
-      { id: 'easter_10', title: 'Golden Egg', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'easter_golden', coins: 1000 }, completed: false, claimed: false },
+      { id: 'easter_1', title: 'Egg Hunt', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50, gems: 5 }, completed: false, claimed: false },
+      { id: 'easter_2', title: 'Basket', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50, gems: 10 }, completed: false, claimed: false },
+      { id: 'easter_3', title: 'Bunny Trail', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100, gems: 15 }, completed: false, claimed: false },
+      { id: 'easter_4', title: 'Chocolate Egg', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'easter_bunny', gems: 20 }, completed: false, claimed: false },
+      { id: 'easter_5', title: 'Spring Rain', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150, gems: 25 }, completed: false, claimed: false },
+      { id: 'easter_6', title: 'Flower Field', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150, gems: 30 }, completed: false, claimed: false },
+      { id: 'easter_7', title: 'Bloom', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'easter_bloom', gems: 40 }, completed: false, claimed: false },
+      { id: 'easter_8', title: 'Rainbow', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500, gems: 50 }, completed: false, claimed: false },
+      { id: 'easter_9', title: 'Miracle', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500, gems: 75 }, completed: false, claimed: false },
+      { id: 'easter_10', title: 'Golden Egg', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'easter_golden', coins: 1000, gems: 100 }, completed: false, claimed: false },
     ],
   },
   {
@@ -161,16 +193,16 @@ export const ALL_SEASONS: Season[] = [
       { id: 'halloween_nightmare', name: 'Nightmare', description: 'True terror', price: 500, tier: 'legendary', themeValue: 'nightmare' as Theme },
     ],
     challenges: [
-      { id: 'hw_1', title: 'Trick', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50 }, completed: false, claimed: false },
-      { id: 'hw_2', title: 'Treat', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50 }, completed: false, claimed: false },
-      { id: 'hw_3', title: 'Haunted', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100 }, completed: false, claimed: false },
-      { id: 'hw_4', title: 'Ghost', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'halloween_ghost' }, completed: false, claimed: false },
-      { id: 'hw_5', title: 'Skeleton', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150 }, completed: false, claimed: false },
-      { id: 'hw_6', title: 'Vampire', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150 }, completed: false, claimed: false },
-      { id: 'hw_7', title: 'Witch', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'halloween_witch' }, completed: false, claimed: false },
-      { id: 'hw_8', title: 'Werewolf', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500 }, completed: false, claimed: false },
-      { id: 'hw_9', title: 'Demon', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500 }, completed: false, claimed: false },
-      { id: 'hw_10', title: 'Nightmare', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'halloween_nightmare', coins: 1000 }, completed: false, claimed: false },
+      { id: 'hw_1', title: 'Trick', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50, gems: 5 }, completed: false, claimed: false },
+      { id: 'hw_2', title: 'Treat', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50, gems: 10 }, completed: false, claimed: false },
+      { id: 'hw_3', title: 'Haunted', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100, gems: 15 }, completed: false, claimed: false },
+      { id: 'hw_4', title: 'Ghost', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'halloween_ghost', gems: 20 }, completed: false, claimed: false },
+      { id: 'hw_5', title: 'Skeleton', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150, gems: 25 }, completed: false, claimed: false },
+      { id: 'hw_6', title: 'Vampire', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150, gems: 30 }, completed: false, claimed: false },
+      { id: 'hw_7', title: 'Witch', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'halloween_witch', gems: 40 }, completed: false, claimed: false },
+      { id: 'hw_8', title: 'Werewolf', description: 'Reach 512 on a 3x3 board', targetTile: 512, boardSize: 3, order: 8, rewards: { seasonCredits: 300, coins: 500, gems: 50 }, completed: false, claimed: false },
+      { id: 'hw_9', title: 'Demon', description: 'Reach 1024 on a 4x4 board', targetTile: 1024, boardSize: 4, order: 9, rewards: { seasonCredits: 500, gems: 75 }, completed: false, claimed: false },
+      { id: 'hw_10', title: 'Nightmare', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 10, rewards: { themeId: 'halloween_nightmare', coins: 1000, gems: 100 }, completed: false, claimed: false },
     ],
   },
   {
@@ -178,7 +210,7 @@ export const ALL_SEASONS: Season[] = [
     name: 'Festival of Lights',
     emoji: '🕎',
     startDate: '2026-12-05',
-    endDate: '2026-12-13',
+    endDate: '2026-12-20',
     description: 'Light the menorah and celebrate 8 nights of gaming!',
     gradientFrom: '#1a4b8c',
     gradientTo: '#ffd700',
@@ -191,14 +223,14 @@ export const ALL_SEASONS: Season[] = [
       { id: 'hanukkah_miracle', name: 'Miracle Light', description: 'Divine radiance', price: 500, tier: 'legendary', themeValue: 'miracle' as Theme },
     ],
     challenges: [
-      { id: 'han_1', title: 'First Light', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50 }, completed: false, claimed: false },
-      { id: 'han_2', title: 'Second Night', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50 }, completed: false, claimed: false },
-      { id: 'han_3', title: 'Third Flame', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100 }, completed: false, claimed: false },
-      { id: 'han_4', title: 'Fourth Glow', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'hanukkah_dreidel' }, completed: false, claimed: false },
-      { id: 'han_5', title: 'Fifth Shine', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150 }, completed: false, claimed: false },
-      { id: 'han_6', title: 'Sixth Star', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150 }, completed: false, claimed: false },
-      { id: 'han_7', title: 'Seventh Wonder', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'hanukkah_gelt' }, completed: false, claimed: false },
-      { id: 'han_8', title: 'Eighth Miracle', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 8, rewards: { themeId: 'hanukkah_miracle', coins: 1000 }, completed: false, claimed: false },
+      { id: 'han_1', title: 'First Light', description: 'Reach 64 on a 4x4 board', targetTile: 64, boardSize: 4, order: 1, rewards: { seasonCredits: 25, coins: 50, gems: 5 }, completed: false, claimed: false },
+      { id: 'han_2', title: 'Second Night', description: 'Reach 128 on a 4x4 board', targetTile: 128, boardSize: 4, order: 2, rewards: { seasonCredits: 50, gems: 10 }, completed: false, claimed: false },
+      { id: 'han_3', title: 'Third Flame', description: 'Reach 64 on a 3x3 board', targetTile: 64, boardSize: 3, order: 3, rewards: { seasonCredits: 75, coins: 100, gems: 15 }, completed: false, claimed: false },
+      { id: 'han_4', title: 'Fourth Glow', description: 'Reach 128 on a 3x3 board', targetTile: 128, boardSize: 3, order: 4, rewards: { seasonCredits: 100, themeId: 'hanukkah_dreidel', gems: 20 }, completed: false, claimed: false },
+      { id: 'han_5', title: 'Fifth Shine', description: 'Reach 256 on a 4x4 board', targetTile: 256, boardSize: 4, order: 5, rewards: { seasonCredits: 100, coins: 150, gems: 25 }, completed: false, claimed: false },
+      { id: 'han_6', title: 'Sixth Star', description: 'Reach 256 on a 3x3 board', targetTile: 256, boardSize: 3, order: 6, rewards: { seasonCredits: 150, gems: 30 }, completed: false, claimed: false },
+      { id: 'han_7', title: 'Seventh Wonder', description: 'Reach 512 on a 4x4 board', targetTile: 512, boardSize: 4, order: 7, rewards: { seasonCredits: 200, themeId: 'hanukkah_gelt', gems: 40 }, completed: false, claimed: false },
+      { id: 'han_8', title: 'Eighth Miracle', description: 'Reach 2048 on a 4x4 board', targetTile: 2048, boardSize: 4, order: 8, rewards: { themeId: 'hanukkah_miracle', coins: 1000, gems: 100 }, completed: false, claimed: false },
     ],
   },
 ];
@@ -215,7 +247,7 @@ export const useSeasons = () => {
     localStorage.setItem(SEASON_STORAGE_KEY, JSON.stringify(seasonProgress));
   }, [seasonProgress]);
 
-  // Get currently active seasons
+  // Get currently active seasons (can be multiple overlapping!)
   const getActiveSeasons = useCallback((): Season[] => {
     const now = new Date();
     return ALL_SEASONS.filter(season => {
@@ -223,6 +255,11 @@ export const useSeasons = () => {
       const end = new Date(season.endDate);
       end.setHours(23, 59, 59, 999);
       return now >= start && now <= end;
+    }).sort((a, b) => {
+      // Sort by end date (longest running first for "main" season)
+      const aEnd = new Date(a.endDate).getTime();
+      const bEnd = new Date(b.endDate).getTime();
+      return bEnd - aEnd;
     });
   }, []);
 
@@ -231,7 +268,6 @@ export const useSeasons = () => {
     const existing = seasonProgress.find(p => p.seasonId === seasonId);
     if (existing) return existing;
     
-    const season = ALL_SEASONS.find(s => s.id === seasonId);
     return {
       seasonId,
       seasonCredits: 0,
@@ -297,7 +333,7 @@ export const useSeasons = () => {
   }, []);
 
   // Claim challenge rewards
-  const claimChallengeReward = useCallback((seasonId: string, challengeId: string): { coins: number; seasonCredits: number; themeId?: string } | null => {
+  const claimChallengeReward = useCallback((seasonId: string, challengeId: string): { coins: number; seasonCredits: number; gems: number; themeId?: string } | null => {
     const progress = getSeasonProgress(seasonId);
     const season = ALL_SEASONS.find(s => s.id === seasonId);
     const challenge = season?.challenges.find(c => c.id === challengeId);
@@ -324,6 +360,7 @@ export const useSeasons = () => {
     return {
       coins: challenge.rewards.coins || 0,
       seasonCredits: challenge.rewards.seasonCredits || 0,
+      gems: challenge.rewards.gems || 0,
       themeId: challenge.rewards.themeId,
     };
   }, [getSeasonProgress]);
