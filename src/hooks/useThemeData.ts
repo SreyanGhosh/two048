@@ -811,3 +811,12 @@ export const getGridColor = (theme: Theme) => ALL_GRID_COLORS[theme] || ALL_GRID
 export const getBoardTexture = (theme: Theme) => BOARD_TEXTURES[theme];
 export const getThemeButtonStyle = (theme: Theme) => THEME_BUTTON_STYLES[theme] || THEME_BUTTON_STYLES.classic!;
 export const getThemeName = (theme: Theme) => THEME_NAMES[theme] || theme;
+
+// Theme-based background gradients for game screens
+export const getThemeBackground = (theme: Theme): React.CSSProperties => {
+  const gridColor = getGridColor(theme);
+  const buttonStyle = getThemeButtonStyle(theme);
+  return {
+    background: `linear-gradient(135deg, ${gridColor} 0%, ${buttonStyle.bg} 100%)`,
+  };
+};

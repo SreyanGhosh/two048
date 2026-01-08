@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useGame2048, Theme } from '@/hooks/useGame2048';
 import { GameHeader } from './GameHeader';
 import { GameBoard } from './GameBoard';
 import { GameOverlay } from './GameOverlay';
+import { getThemeBackground } from '@/hooks/useThemeData';
 
 interface ClassicGameProps {
   initialTheme: Theme;
@@ -36,7 +37,14 @@ export const ClassicGame = ({
 
   const [showOverlay, setShowOverlay] = useState(false);
 
-  // Report game end exactly once per run (avoid render-side effects / double increments)
+  // Set initial theme from equipped theme
+  useEffect(() => {
+    if (initialTheme && initialTheme !== theme) {
+      setTheme(initialTheme);
+    }
+  }, [initialTheme, setTheme, theme]);
+
+  // Report game end exactly once per run
   useEffect(() => {
     if (!(gameOver || won) || showOverlay) return;
 
@@ -44,35 +52,34 @@ export const ClassicGame = ({
     const highestTile = Math.max(...board.flat());
     onGameEnd(score, highestTile);
   }, [gameOver, won, showOverlay, board, score, onGameEnd]);
-  // Filter themes to only show unlocked ones
-  const handleThemeChange = useCallback((newTheme: Theme) => {
-    if (unlockedThemes.includes(newTheme)) {
-      setTheme(newTheme);
-    }
-  }, [unlockedThemes, setTheme]);
+
+  // Get theme-based background
+  const bgStyle = getThemeBackground(theme);
 
   return (
-    <div className="game-container min-h-screen flex flex-col items-center justify-center py-8 bg-background">
+    <div className="game-container min-h-screen flex flex-col items-center justify-center py-8" style={bgStyle}>
       {/* Back button */}
       <div className="w-full max-w-md px-4 mb-4">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="font-bold">Home</span>
         </button>
       </div>
 
+      {/* Header without theme selector - theme is set via inventory equip */}
       <GameHeader
         score={score}
         bestScore={bestScore}
         size={size}
         theme={theme}
         onSizeChange={setSize}
-        onThemeChange={handleThemeChange}
+        onThemeChange={() => {}} // No-op, theme changes via inventory
         onNewGame={() => initGame()}
         unlockedThemes={unlockedThemes}
+        hideThemeSelector={true}
       />
 
       <div className="relative">
@@ -98,7 +105,7 @@ export const ClassicGame = ({
         />
       </div>
 
-      <p className="text-muted-foreground text-sm mt-6 text-center px-4">
+      <p className="text-white/60 text-sm mt-6 text-center px-4">
         Use arrow keys or swipe to move tiles. Combine matching numbers to reach 2048!
       </p>
     </div>

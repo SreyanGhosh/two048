@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Coins, Gem, Trophy, ShoppingBag, Gamepad2, Timer, Package, Layers, Calendar, Settings, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Coins, Gem, Trophy, ShoppingBag, Gamepad2, Timer, Package, Layers, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Season } from '@/hooks/useSeasons';
 
 interface FCHomeScreenProps {
   coins: number;
   gems: number;
-  hasActiveSeasons: boolean;
-  activeSeason?: Season;
+  activeSeasons: Season[];
   equippedThemeName: string;
   onPlayClassic: () => void;
   onPlayCompetitive: () => void;
@@ -20,8 +19,7 @@ interface FCHomeScreenProps {
 export const FCHomeScreen = ({
   coins,
   gems,
-  hasActiveSeasons,
-  activeSeason,
+  activeSeasons,
   equippedThemeName,
   onPlayClassic,
   onPlayCompetitive,
@@ -32,6 +30,8 @@ export const FCHomeScreen = ({
   onOpenInventory,
 }: FCHomeScreenProps) => {
   const [floatingTiles, setFloatingTiles] = useState<{ id: number; value: number; x: number; delay: number }[]>([]);
+  const [currentSeasonIndex, setCurrentSeasonIndex] = useState(0);
+  const bottomNavRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const tiles = Array.from({ length: 6 }, (_, i) => ({
@@ -43,10 +43,22 @@ export const FCHomeScreen = ({
     setFloatingTiles(tiles);
   }, []);
 
-  // Dynamic background based on season
-  const bgGradient = activeSeason
-    ? `linear-gradient(135deg, ${activeSeason.gradientFrom} 0%, ${activeSeason.gradientTo} 100%)`
+  // Get the "main" season (first one for background)
+  const mainSeason = activeSeasons[0];
+  const currentSeason = activeSeasons[currentSeasonIndex] || mainSeason;
+
+  // Dynamic background based on main season
+  const bgGradient = mainSeason
+    ? `linear-gradient(135deg, ${mainSeason.gradientFrom} 0%, ${mainSeason.gradientTo} 100%)`
     : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+
+  const handlePrevSeason = () => {
+    setCurrentSeasonIndex((prev) => (prev > 0 ? prev - 1 : activeSeasons.length - 1));
+  };
+
+  const handleNextSeason = () => {
+    setCurrentSeasonIndex((prev) => (prev < activeSeasons.length - 1 ? prev + 1 : 0));
+  };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: bgGradient }}>
@@ -67,7 +79,7 @@ export const FCHomeScreen = ({
         ))}
       </div>
 
-      {/* Top bar - FC Mobile style */}
+      {/* Top bar - FC Mobile style - No plus buttons, no settings */}
       <div className="relative z-10 flex items-center justify-between p-3 bg-black/30">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center font-black text-white text-lg">
@@ -80,21 +92,16 @@ export const FCHomeScreen = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Coins */}
+          {/* Coins - No plus button */}
           <div className="flex items-center gap-1 bg-black/40 px-3 py-1.5 rounded-full">
             <Coins className="w-4 h-4 text-yellow-400" />
             <span className="text-white font-bold text-sm">{coins.toLocaleString()}</span>
-            <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">+</div>
           </div>
-          {/* Gems */}
+          {/* Gems - No plus button */}
           <div className="flex items-center gap-1 bg-black/40 px-3 py-1.5 rounded-full">
             <Gem className="w-4 h-4 text-purple-400" />
             <span className="text-white font-bold text-sm">{gems.toLocaleString()}</span>
-            <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">+</div>
           </div>
-          <button className="w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
-            <Settings className="w-4 h-4 text-white/70" />
-          </button>
         </div>
       </div>
 
@@ -124,24 +131,66 @@ export const FCHomeScreen = ({
 
         {/* Center content */}
         <div className="flex-1 flex flex-col gap-4">
-          {/* Season banner */}
-          {hasActiveSeasons && activeSeason && (
-            <button
-              onClick={onOpenSeasons}
-              className="relative overflow-hidden rounded-lg bg-gradient-to-r from-black/40 to-transparent p-4 border border-white/10 hover:border-white/30 transition-colors group"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white/60 text-xs uppercase tracking-wider">Active Season</p>
-                  <h2 className="text-white font-black text-2xl">{activeSeason.name} {activeSeason.emoji}</h2>
-                  <p className="text-white/70 text-sm">{activeSeason.description}</p>
+          {/* Season banner with navigation for multiple seasons */}
+          {activeSeasons.length > 0 && currentSeason && (
+            <div className="relative">
+              {activeSeasons.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevSeason}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleNextSeason}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+              <button
+                onClick={onOpenSeasons}
+                className="w-full relative overflow-hidden rounded-lg p-4 border border-white/10 hover:border-white/30 transition-colors group"
+                style={{
+                  background: `linear-gradient(135deg, ${currentSeason.gradientFrom}80, ${currentSeason.gradientTo}80)`,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-white/60 text-xs uppercase tracking-wider">Active Season</p>
+                      {activeSeasons.length > 1 && (
+                        <span className="text-white/40 text-xs">
+                          {currentSeasonIndex + 1}/{activeSeasons.length}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-white font-black text-2xl">{currentSeason.name} {currentSeason.emoji}</h2>
+                    <p className="text-white/70 text-sm">{currentSeason.description}</p>
+                  </div>
+                  <ChevronRight className="w-6 h-6 text-white/50 group-hover:text-white transition-colors" />
                 </div>
-                <ChevronRight className="w-6 h-6 text-white/50 group-hover:text-white transition-colors" />
-              </div>
-              {/* Decorative elements */}
-              <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/5" />
-              <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5" />
-            </button>
+                {/* Decorative elements */}
+                <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/5" />
+                <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5" />
+              </button>
+              
+              {/* Season dots indicator */}
+              {activeSeasons.length > 1 && (
+                <div className="flex justify-center gap-1 mt-2">
+                  {activeSeasons.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        idx === currentSeasonIndex ? 'bg-white' : 'bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           {/* Play cards - FC Mobile style */}
@@ -195,12 +244,16 @@ export const FCHomeScreen = ({
         </div>
       </div>
 
-      {/* Bottom navigation - FC Mobile style */}
+      {/* Bottom navigation - FC Mobile style - Scrollable */}
       <div className="relative z-10 bg-black/50 backdrop-blur border-t border-white/10">
-        <div className="flex items-center justify-around py-2">
+        <div
+          ref={bottomNavRef}
+          className="flex items-center overflow-x-auto scrollbar-hide py-2 px-2"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           <button
             onClick={onOpenQuests}
-            className="flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             <Trophy className="w-5 h-5 text-yellow-400" />
             <span className="text-white text-xs font-bold">QUESTS</span>
@@ -208,7 +261,7 @@ export const FCHomeScreen = ({
 
           <button
             onClick={onOpenSeasons}
-            className="flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             <Calendar className="w-5 h-5 text-red-400" />
             <span className="text-white text-xs font-bold">SEASONS</span>
@@ -216,7 +269,7 @@ export const FCHomeScreen = ({
 
           <button
             onClick={onOpenMarket}
-            className="flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             <ShoppingBag className="w-5 h-5 text-green-400" />
             <span className="text-white text-xs font-bold">MARKET</span>
@@ -224,7 +277,7 @@ export const FCHomeScreen = ({
 
           <button
             onClick={onOpenInventory}
-            className="flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             <Layers className="w-5 h-5 text-purple-400" />
             <span className="text-white text-xs font-bold">INVENTORY</span>
@@ -232,7 +285,7 @@ export const FCHomeScreen = ({
 
           <button
             onClick={onOpenStore}
-            className="flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             <Package className="w-5 h-5 text-orange-400" />
             <span className="text-white text-xs font-bold">STORE</span>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Timer, Trophy } from 'lucide-react';
 import { useGame2048, Theme } from '@/hooks/useGame2048';
 import { GameBoard } from './GameBoard';
+import { getThemeBackground } from '@/hooks/useThemeData';
 
 interface CompetitiveGameProps {
   theme: Theme;
@@ -23,6 +24,7 @@ export const CompetitiveGame = ({
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
+  const [hasReportedEnd, setHasReportedEnd] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const {
@@ -47,6 +49,7 @@ export const CompetitiveGame = ({
     setTimeLeft(GAME_DURATION);
     setIsPlaying(true);
     setGameEnded(false);
+    setHasReportedEnd(false);
   }, [initGame]);
 
   // Timer logic
@@ -69,13 +72,14 @@ export const CompetitiveGame = ({
     };
   }, [isPlaying]);
 
-  // Notify parent when game ends
+  // Notify parent when game ends - only once
   useEffect(() => {
-    if (gameEnded) {
+    if (gameEnded && !hasReportedEnd) {
+      setHasReportedEnd(true);
       const highestTile = Math.max(...board.flat());
       onGameEnd(score, highestTile);
     }
-  }, [gameEnded, score, board, onGameEnd]);
+  }, [gameEnded, hasReportedEnd, score, board, onGameEnd]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -89,8 +93,11 @@ export const CompetitiveGame = ({
     return 'text-white';
   };
 
+  // Get theme-based background
+  const bgStyle = getThemeBackground(theme);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-rose-600 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4" style={bgStyle}>
       {/* Header */}
       <div className="w-full max-w-md flex items-center justify-between mb-4">
         <button
