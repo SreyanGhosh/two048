@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { GameTile, getGridColor } from './GameTile';
+import { GameTile, getGridColor, getBoardTexture } from './GameTile';
 import type { Theme } from '@/hooks/useGame2048';
 
 interface GameBoardProps {
@@ -70,12 +70,17 @@ export const GameBoard = ({ board, size, theme, newTiles, mergedTiles, onMove }:
     touchStart.current = null;
   };
 
+  const boardTexture = getBoardTexture(theme);
+
   return (
     <div
       ref={containerRef}
       className="game-grid touch-none"
       style={{
         backgroundColor: getGridColor(theme),
+        backgroundImage: boardTexture,
+        backgroundBlendMode: 'overlay',
+        backgroundSize: '64px 64px',
         width: gridSize,
         height: gridSize,
         display: 'grid',

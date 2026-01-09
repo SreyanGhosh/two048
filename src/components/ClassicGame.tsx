@@ -36,6 +36,7 @@ export const ClassicGame = ({
   } = useGame2048(4);
 
   const [showOverlay, setShowOverlay] = useState(false);
+  const [hasReportedEnd, setHasReportedEnd] = useState(false);
 
   // Set initial theme from equipped theme
   useEffect(() => {
@@ -44,14 +45,18 @@ export const ClassicGame = ({
     }
   }, [initialTheme, setTheme, theme]);
 
-  // Report game end exactly once per run
+  // Report game end exactly once per run (prevents free-gem loop)
   useEffect(() => {
-    if (!(gameOver || won) || showOverlay) return;
+    if (!(gameOver || won)) return;
 
-    setShowOverlay(true);
-    const highestTile = Math.max(...board.flat());
-    onGameEnd(score, highestTile);
-  }, [gameOver, won, showOverlay, board, score, onGameEnd]);
+    if (!showOverlay) setShowOverlay(true);
+
+    if (!hasReportedEnd) {
+      setHasReportedEnd(true);
+      const highestTile = Math.max(...board.flat());
+      onGameEnd(score, highestTile);
+    }
+  }, [gameOver, won, showOverlay, hasReportedEnd, board, score, onGameEnd]);
 
   // Get theme-based background
   const bgStyle = getThemeBackground(theme);
@@ -100,6 +105,7 @@ export const ClassicGame = ({
           onNewGame={() => {
             initGame();
             setShowOverlay(false);
+            setHasReportedEnd(false);
           }}
           onClose={() => setShowOverlay(false)}
         />

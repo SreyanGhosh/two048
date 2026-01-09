@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Timer, Trophy } from 'lucide-react';
 import { useGame2048, Theme } from '@/hooks/useGame2048';
 import { GameBoard } from './GameBoard';
-import { getThemeBackground } from '@/hooks/useThemeData';
+import { getThemeBackground, getThemeName } from '@/hooks/useThemeData';
 
 interface CompetitiveGameProps {
-  theme: Theme;
+  theme: Theme; // equipped theme (default)
   unlockedThemes: Theme[];
   onBack: () => void;
   onGameEnd: (score: number, highestTile: number) => void;
@@ -14,23 +14,30 @@ interface CompetitiveGameProps {
 
 const GAME_DURATION = 60; // seconds
 
-export const CompetitiveGame = ({ 
-  theme, 
+type EndReason = 'time' | 'nomoves' | 'won';
+
+export const CompetitiveGame = ({
+  theme: equippedTheme,
   unlockedThemes,
-  onBack, 
+  onBack,
   onGameEnd,
-  bestScore 
+  bestScore,
 }: CompetitiveGameProps) => {
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
+  const [endReason, setEndReason] = useState<EndReason>('time');
   const [hasReportedEnd, setHasReportedEnd] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const {
     board,
     score,
     size,
+    theme,
+    gameOver,
+    won,
     newTiles,
     mergedTiles,
     move,
@@ -38,48 +45,73 @@ export const CompetitiveGame = ({
     setTheme,
   } = useGame2048(4);
 
-  // Set theme on mount
-  useEffect(() => {
-    setTheme(theme);
-  }, [theme, setTheme]);
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
 
-  // Start the game
+  const endGame = useCallback(
+    (reason: EndReason) => {
+      stopTimer();
+      setIsPlaying(false);
+      setGameEnded(true);
+      setEndReason(reason);
+    },
+    [stopTimer]
+  );
+
+  // Apply equipped theme as default on mount / when equipped changes
+  useEffect(() => {
+    setTheme(equippedTheme);
+  }, [equippedTheme, setTheme]);
+
   const startGame = useCallback(() => {
     initGame();
     setTimeLeft(GAME_DURATION);
     setIsPlaying(true);
     setGameEnded(false);
     setHasReportedEnd(false);
+    setEndReason('time');
   }, [initGame]);
 
-  // Timer logic
+  // Timer
   useEffect(() => {
     if (!isPlaying) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          setIsPlaying(false);
-          setGameEnded(true);
+          endGame('time');
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isPlaying]);
+    return () => stopTimer();
+  }, [isPlaying, endGame, stopTimer]);
 
-  // Notify parent when game ends - only once
+  // End early if no moves / won (before the timer runs out)
   useEffect(() => {
-    if (gameEnded && !hasReportedEnd) {
-      setHasReportedEnd(true);
-      const highestTile = Math.max(...board.flat());
-      onGameEnd(score, highestTile);
+    if (!isPlaying || gameEnded) return;
+    if (won) {
+      endGame('won');
+      return;
     }
-  }, [gameEnded, hasReportedEnd, score, board, onGameEnd]);
+    if (gameOver) {
+      endGame('nomoves');
+    }
+  }, [isPlaying, gameEnded, won, gameOver, endGame]);
+
+  // Notify parent exactly once when game ends (fixes counter bugs)
+  useEffect(() => {
+    if (!gameEnded || hasReportedEnd) return;
+    setHasReportedEnd(true);
+    const highestTile = Math.max(...board.flat());
+    onGameEnd(score, highestTile);
+  }, [gameEnded, hasReportedEnd, board, score, onGameEnd]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -93,13 +125,14 @@ export const CompetitiveGame = ({
     return 'text-white';
   };
 
-  // Get theme-based background
   const bgStyle = getThemeBackground(theme);
+
+  const endTitle = endReason === 'time' ? "Time's Up!" : endReason === 'won' ? 'You Won!' : 'Game Over';
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4" style={bgStyle}>
       {/* Header */}
-      <div className="w-full max-w-md flex items-center justify-between mb-4">
+      <div className="w-full max-w-md flex items-center justify-between gap-2 mb-4">
         <button
           onClick={onBack}
           className="bg-white/20 p-2 rounded-xl text-white hover:bg-white/30 transition-colors"
@@ -116,6 +149,21 @@ export const CompetitiveGame = ({
           <p className="text-white/60 text-xs">Best</p>
           <p className="text-white font-bold">{bestScore.toLocaleString()}</p>
         </div>
+      </div>
+
+      {/* Theme selector (Competitive only) */}
+      <div className="w-full max-w-md mb-3">
+        <select
+          value={theme}
+          onChange={(e) => setTheme(e.target.value as Theme)}
+          className="w-full bg-white/15 text-white rounded-xl px-3 py-2 font-bold"
+        >
+          {unlockedThemes.map((t) => (
+            <option key={t} value={t} className="text-black">
+              {getThemeName(t)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Score */}
@@ -151,10 +199,10 @@ export const CompetitiveGame = ({
         {gameEnded && (
           <div className="absolute inset-0 bg-black/70 rounded-xl flex flex-col items-center justify-center p-6">
             <Trophy className="w-16 h-16 text-yellow-400 mb-4" />
-            <h2 className="text-white text-3xl font-black mb-2">Time's Up!</h2>
+            <h2 className="text-white text-3xl font-black mb-2">{endTitle}</h2>
             <p className="text-white/70 mb-1">Final Score</p>
             <p className="text-yellow-400 text-4xl font-black mb-6">{score.toLocaleString()}</p>
-            
+
             {score > bestScore && (
               <p className="text-green-400 font-bold mb-4 animate-bounce">🎉 New Record!</p>
             )}
@@ -177,9 +225,7 @@ export const CompetitiveGame = ({
         )}
       </div>
 
-      <p className="text-white/50 text-sm mt-6">
-        Get the highest score in 60 seconds!
-      </p>
+      <p className="text-white/50 text-sm mt-6">Get the highest score in 60 seconds!</p>
     </div>
   );
 };

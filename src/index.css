@@ -154,6 +154,16 @@
   .animate-spin-slow {
     animation: spin 4s linear infinite;
   }
+
+  /* Hide scrollbars (used by FC bottom nav) */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes pop {

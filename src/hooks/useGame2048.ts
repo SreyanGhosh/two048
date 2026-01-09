@@ -8,9 +8,11 @@ export type BaseTheme = 'classic' | 'blue' | 'fire' | 'bubblegum' | 'dark' | 'fo
 export type TexturedTheme = 'marble' | 'wood' | 'carbon' | 'crystal' | 'leather' | 'denim' | 'velvet' | 'brushed_metal';
 
 // Seasonal themes
-export type SeasonalTheme = 
+export type SeasonalTheme =
   // Christmas
   | 'christmas' | 'snow' | 'ice' | 'santa'
+  // New Year
+  | 'newyear' | 'firework' | 'champagne' | 'countdown'
   // Valentine's
   | 'hearts' | 'rose' | 'cupid' | 'eternal'
   // Easter
