@@ -20,18 +20,21 @@ export const GameTile = memo(({ value, size, theme, isNew, isMerged }: GameTileP
   const animationClass = isNew ? 'animate-spawn' : isMerged ? 'animate-pop' : '';
 
   return (
-    <div
-      className={`game-cell ${animationClass}`}
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: styles.bg,
-        color: styles.text,
-        fontSize: value > 512 ? fontSize * 0.8 : fontSize,
-      }}
-    >
-      {value > 0 && value}
-    </div>
+      <div
+        className={`game-cell ${animationClass}`}
+        style={{
+          width: size,
+          height: size,
+          backgroundColor: styles.bg,
+          backgroundImage: value > 0 ? getBoardTexture(theme) : undefined,
+          backgroundBlendMode: 'overlay',
+          backgroundSize: '48px 48px',
+          color: styles.text,
+          fontSize: value > 512 ? fontSize * 0.8 : fontSize,
+        }}
+      >
+        {value > 0 && value}
+      </div>
   );
 });
 

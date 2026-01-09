@@ -373,19 +373,58 @@ export const useGameStore = () => {
     const challenge = challengeList.find(c => c.id === challengeId);
     if (!challenge || !challenge.completed || challenge.claimed) return 0;
 
-    setStore(prev => ({
-      ...prev,
-      coins: prev.coins + challenge.reward,
-      challenges: isDaily ? prev.challenges : prev.challenges.map(c =>
-        c.id === challengeId ? { ...c, claimed: true } : c
-      ),
-      dailyChallenges: isDaily ? prev.dailyChallenges.map(c =>
-        c.id === challengeId ? { ...c, claimed: true } : c
-      ) : prev.dailyChallenges,
-    }));
+    setStore(prev => {
+      const getCurrentForType = (type: Challenge['type']) => {
+        switch (type) {
+          case 'score':
+            return Math.max(prev.bestClassicScore, prev.bestCompetitiveScore);
+          case 'competitive_plays':
+            return prev.competitivePlays;
+          case 'games_played':
+            return prev.gamesPlayed;
+          case 'tile_reached':
+            return prev.highestTile;
+        }
+      };
+
+      const createNextMainChallenge = (c: Challenge): Challenge => {
+        const scaleTarget = 1.5;
+        const scaleReward = 1.35;
+        const nextTarget = Math.max(c.target + 1, Math.floor(c.target * scaleTarget));
+        const nextReward = Math.max(c.reward + 10, Math.floor(c.reward * scaleReward));
+
+        const typeLabel =
+          c.type === 'score' ? 'Score' : c.type === 'competitive_plays' ? 'Play competitive' : c.type === 'games_played' ? 'Play games' : 'Reach tile';
+
+        return {
+          ...c,
+          id: `${c.type}_${nextTarget}_${Date.now()}`,
+          title: `${c.title} II`,
+          description: `${typeLabel} ${nextTarget.toLocaleString()}`,
+          target: nextTarget,
+          reward: nextReward,
+          claimed: false,
+          completed: false,
+          current: getCurrentForType(c.type),
+        };
+      };
+
+      return {
+        ...prev,
+        coins: prev.coins + challenge.reward,
+        // Main quests: immediately replace claimed quest with a harder one ("grindable")
+        challenges: isDaily
+          ? prev.challenges
+          : prev.challenges.map(c => (c.id === challengeId ? createNextMainChallenge(c) : c)),
+        // Daily quests: just mark claimed (they refresh each day)
+        dailyChallenges: isDaily
+          ? prev.dailyChallenges.map(c => (c.id === challengeId ? { ...c, claimed: true } : c))
+          : prev.dailyChallenges,
+      };
+    });
 
     return challenge.reward;
-  }, [store.challenges, store.dailyChallenges]);
+  }, [store.challenges, store.dailyChallenges, store.bestClassicScore, store.bestCompetitiveScore, store.gamesPlayed, store.competitivePlays, store.highestTile]);
 
   const resetProgress = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);

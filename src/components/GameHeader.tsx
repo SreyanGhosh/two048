@@ -10,6 +10,7 @@ interface GameHeaderProps {
   onThemeChange: (theme: Theme) => void;
   onNewGame: () => void;
   unlockedThemes?: Theme[];
+  hideThemeSelector?: boolean;
 }
 
 // Base themes always available in the dropdown
@@ -24,6 +25,7 @@ export const GameHeader = ({
   onThemeChange,
   onNewGame,
   unlockedThemes,
+  hideThemeSelector,
 }: GameHeaderProps) => {
   const buttonStyle = getThemeButtonStyle(theme);
   const boxStyle = getThemeButtonStyle(theme);
@@ -67,18 +69,20 @@ export const GameHeader = ({
           ))}
         </select>
 
-        <select
-          value={theme}
-          onChange={(e) => onThemeChange(e.target.value as Theme)}
-          className="game-select"
-          style={{ backgroundColor: boxStyle.bg, color: boxStyle.text }}
-        >
-          {(unlockedThemes || BASE_THEMES).map((t) => (
-            <option key={t} value={t}>
-              {getThemeName(t)}
-            </option>
-          ))}
-        </select>
+        {!hideThemeSelector && (
+          <select
+            value={theme}
+            onChange={(e) => onThemeChange(e.target.value as Theme)}
+            className="game-select"
+            style={{ backgroundColor: boxStyle.bg, color: boxStyle.text }}
+          >
+            {(unlockedThemes || BASE_THEMES).map((t) => (
+              <option key={t} value={t}>
+                {getThemeName(t)}
+              </option>
+            ))}
+          </select>
+        )}
 
         <button
           onClick={onNewGame}

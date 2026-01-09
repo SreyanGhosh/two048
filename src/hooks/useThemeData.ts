@@ -666,6 +666,68 @@ export const ALL_THEME_STYLES: Partial<Record<Theme, Record<number, { bg: string
     2048: { bg: '#fff', text: '#1a4b8c' },
     4096: { bg: '#0d0d4d', text: '#ffd700' },
   },
+
+  // New Year themes (used by New Year Celebration season)
+  newyear: {
+    0: { bg: '#0f172a', text: '#ffd700' },
+    2: { bg: '#111827', text: '#ffd700' },
+    4: { bg: '#1f2937', text: '#ffd700' },
+    8: { bg: '#312e81', text: '#fff' },
+    16: { bg: '#1d4ed8', text: '#fff' },
+    32: { bg: '#a21caf', text: '#fff' },
+    64: { bg: '#ffd700', text: '#0f172a' },
+    128: { bg: '#f59e0b', text: '#0f172a' },
+    256: { bg: '#fb7185', text: '#0f172a' },
+    512: { bg: '#38bdf8', text: '#0f172a' },
+    1024: { bg: '#22c55e', text: '#0f172a' },
+    2048: { bg: '#fff', text: '#0f172a' },
+    4096: { bg: '#000000', text: '#ffd700' },
+  },
+  firework: {
+    0: { bg: '#0b1023', text: '#f472b6' },
+    2: { bg: '#111827', text: '#60a5fa' },
+    4: { bg: '#1f2937', text: '#34d399' },
+    8: { bg: '#ec4899', text: '#0b1023' },
+    16: { bg: '#60a5fa', text: '#0b1023' },
+    32: { bg: '#34d399', text: '#0b1023' },
+    64: { bg: '#fbbf24', text: '#0b1023' },
+    128: { bg: '#a78bfa', text: '#0b1023' },
+    256: { bg: '#fb7185', text: '#0b1023' },
+    512: { bg: '#22c55e', text: '#0b1023' },
+    1024: { bg: '#38bdf8', text: '#0b1023' },
+    2048: { bg: '#fff', text: '#0b1023' },
+    4096: { bg: '#000000', text: '#fbbf24' },
+  },
+  champagne: {
+    0: { bg: '#fff8dc', text: '#8b7500' },
+    2: { bg: '#ffefd5', text: '#8b7500' },
+    4: { bg: '#ffe4b5', text: '#8b7500' },
+    8: { bg: '#f7d08a', text: '#3a2a0a' },
+    16: { bg: '#eec97a', text: '#3a2a0a' },
+    32: { bg: '#dab96a', text: '#3a2a0a' },
+    64: { bg: '#caa85a', text: '#fff' },
+    128: { bg: '#b89649', text: '#fff' },
+    256: { bg: '#a78539', text: '#fff' },
+    512: { bg: '#8b6b2c', text: '#fff' },
+    1024: { bg: '#6b5120', text: '#fff' },
+    2048: { bg: '#fff', text: '#8b6b2c' },
+    4096: { bg: '#2a1a0a', text: '#ffe4b5' },
+  },
+  countdown: {
+    0: { bg: '#0a0a0a', text: '#ffd700' },
+    2: { bg: '#111', text: '#ffd700' },
+    4: { bg: '#1a1a1a', text: '#ffd700' },
+    8: { bg: '#262626', text: '#fff' },
+    16: { bg: '#333', text: '#fff' },
+    32: { bg: '#404040', text: '#fff' },
+    64: { bg: '#ffd700', text: '#0a0a0a' },
+    128: { bg: '#f59e0b', text: '#0a0a0a' },
+    256: { bg: '#fb7185', text: '#0a0a0a' },
+    512: { bg: '#38bdf8', text: '#0a0a0a' },
+    1024: { bg: '#22c55e', text: '#0a0a0a' },
+    2048: { bg: '#fff', text: '#0a0a0a' },
+    4096: { bg: '#000000', text: '#ffd700' },
+  },
 };
 
 // Grid colors for each theme
@@ -716,17 +778,23 @@ export const ALL_GRID_COLORS: Partial<Record<Theme, string>> = {
   dreidel: '#4169e1',
   gelt: '#8b6914',
   miracle: '#0d2654',
+  // New Year
+  newyear: '#111827',
+  firework: '#0b1023',
+  champagne: '#f7d08a',
+  countdown: '#0a0a0a',
 };
 
-// Board textures for textured themes
+// Board textures (used for both board + tiles)
+// NOTE: if a theme isn't explicitly listed, we still apply a subtle default texture.
 export const BOARD_TEXTURES: Partial<Record<Theme, string>> = {
   marble: 'linear-gradient(135deg, #f5f5f5 25%, #e0e0e0 25%, #e0e0e0 50%, #f5f5f5 50%, #f5f5f5 75%, #e0e0e0 75%)',
   wood: 'repeating-linear-gradient(90deg, #d4a574 0px, #c4956d 2px, #d4a574 4px)',
   carbon: 'repeating-linear-gradient(0deg, #2a2a2a 0px, #333 1px, #2a2a2a 2px)',
-  crystal: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%)',
+  crystal: 'radial-gradient(circle at 30% 30%, hsla(0 0% 100% / 0.28) 0%, transparent 55%)',
   leather: 'repeating-linear-gradient(45deg, #8b4513 0px, #6b3311 2px, #8b4513 4px)',
   denim: 'repeating-linear-gradient(135deg, #4a6fa5 0px, #3a5f95 1px, #4a6fa5 2px)',
-  velvet: 'radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%)',
+  velvet: 'radial-gradient(circle, hsla(45 95% 55% / 0.12) 0%, transparent 70%)',
   brushed_metal: 'repeating-linear-gradient(90deg, #c0c0c0 0px, #b0b0b0 1px, #c0c0c0 2px)',
 };
 
@@ -748,6 +816,8 @@ export const THEME_BUTTON_STYLES: Partial<Record<Theme, { bg: string; text: stri
   galaxy: { bg: '#9c27b0', text: '#fff' },
   rainbow: { bg: '#ff6b6b', text: '#fff' },
   diamond: { bg: '#00bfff', text: '#fff' },
+
+  // Textured
   marble: { bg: '#c0c0c0', text: '#333' },
   wood: { bg: '#8b6538', text: '#fff' },
   carbon: { bg: '#404040', text: '#00d4ff' },
@@ -756,6 +826,34 @@ export const THEME_BUTTON_STYLES: Partial<Record<Theme, { bg: string; text: stri
   denim: { bg: '#4a6fa5', text: '#fff' },
   velvet: { bg: '#722f37', text: '#ffd700' },
   brushed_metal: { bg: '#888888', text: '#fff' },
+
+  // Seasonal
+  christmas: { bg: '#c41e3a', text: '#fff' },
+  snow: { bg: '#87ceeb', text: '#1a3a4a' },
+  ice: { bg: '#4db0ff', text: '#fff' },
+  santa: { bg: '#8b0000', text: '#ffd700' },
+  hearts: { bg: '#ff1493', text: '#fff' },
+  rose: { bg: '#bc8f8f', text: '#fff' },
+  cupid: { bg: '#f06292', text: '#fff' },
+  eternal: { bg: '#330014', text: '#ff69b4' },
+  easter: { bg: '#81c784', text: '#fff' },
+  bunny: { bg: '#d7ccc8', text: '#4a2f15' },
+  bloom: { bg: '#43a047', text: '#fff' },
+  golden: { bg: '#ffd700', text: '#8b4513' },
+  pumpkin: { bg: '#ff6b35', text: '#2d1b4e' },
+  ghost: { bg: '#87ceeb', text: '#1a1a2e' },
+  witch: { bg: '#32cd32', text: '#1a1a1a' },
+  nightmare: { bg: '#ff0000', text: '#fff' },
+  menorah: { bg: '#1a4b8c', text: '#ffd700' },
+  dreidel: { bg: '#4169e1', text: '#fff' },
+  gelt: { bg: '#daa520', text: '#4a2a07' },
+  miracle: { bg: '#ffd700', text: '#1a4b8c' },
+
+  // New Year
+  newyear: { bg: '#1d4ed8', text: '#ffd700' },
+  firework: { bg: '#ec4899', text: '#0b1023' },
+  champagne: { bg: '#f7d08a', text: '#3a2a0a' },
+  countdown: { bg: '#ffd700', text: '#0a0a0a' },
 };
 
 // Theme names for UI
@@ -784,6 +882,8 @@ export const THEME_NAMES: Partial<Record<Theme, string>> = {
   denim: 'Denim',
   velvet: 'Velvet',
   brushed_metal: 'Brushed Metal',
+
+  // Seasonal
   christmas: 'Christmas',
   snow: 'Snow',
   ice: 'Ice Crystal',
@@ -804,11 +904,19 @@ export const THEME_NAMES: Partial<Record<Theme, string>> = {
   dreidel: 'Dreidel Spin',
   gelt: 'Gelt Glory',
   miracle: 'Miracle Light',
+
+  // New Year
+  newyear: 'Midnight Glow',
+  firework: 'Fireworks',
+  champagne: 'Champagne Pop',
+  countdown: 'Countdown',
 };
 
 export const getThemeStyles = (theme: Theme) => ALL_THEME_STYLES[theme] || ALL_THEME_STYLES.classic!;
 export const getGridColor = (theme: Theme) => ALL_GRID_COLORS[theme] || ALL_GRID_COLORS.classic!;
-export const getBoardTexture = (theme: Theme) => BOARD_TEXTURES[theme];
+export const getBoardTexture = (theme: Theme) =>
+  BOARD_TEXTURES[theme] ||
+  'radial-gradient(circle at 25% 20%, hsla(0 0% 100% / 0.16) 0%, transparent 55%), linear-gradient(135deg, hsla(0 0% 100% / 0.06), hsla(0 0% 0% / 0.10))';
 export const getThemeButtonStyle = (theme: Theme) => THEME_BUTTON_STYLES[theme] || THEME_BUTTON_STYLES.classic!;
 export const getThemeName = (theme: Theme) => THEME_NAMES[theme] || theme;
 
