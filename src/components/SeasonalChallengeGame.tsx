@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Target, Trophy, X } from 'lucide-react';
+import { ArrowLeft, Target, Trophy } from 'lucide-react';
 import { GameBoard } from './GameBoard';
 import { Season, SeasonalChallenge } from '@/hooks/useSeasons';
 import { Theme } from '@/hooks/useGame2048';
+import { useTileAnimations, Tile } from '@/hooks/useTileAnimations';
 
 interface SeasonalChallengeGameProps {
   season: Season;
@@ -92,6 +93,8 @@ export const SeasonalChallengeGame = ({
 }: SeasonalChallengeGameProps) => {
   const completedRef = useRef(false);
   const [showVictory, setShowVictory] = useState(false);
+  const prevBoardRef = useRef<number[][] | null>(null);
+  const lastDirectionRef = useRef<'up' | 'down' | 'left' | 'right'>('up');
   
   const [state, setState] = useState<GameState>(() => {
     const board = createEmptyBoard(challenge.boardSize);
@@ -112,6 +115,30 @@ export const SeasonalChallengeGame = ({
     };
   });
 
+  const { tiles, initializeTiles, updateTilesFromMove, resetTiles } = useTileAnimations(challenge.boardSize);
+
+  // Initialize tiles on first render
+  useEffect(() => {
+    if (tiles.length === 0 && state.board.some(row => row.some(v => v > 0))) {
+      initializeTiles(state.board);
+      prevBoardRef.current = state.board.map(row => [...row]);
+    }
+  }, [state.board, tiles.length, initializeTiles]);
+
+  // Update tiles when board changes from move
+  useEffect(() => {
+    if (prevBoardRef.current && JSON.stringify(prevBoardRef.current) !== JSON.stringify(state.board)) {
+      let newTilePos: [number, number] | null = null;
+      state.newTiles.forEach(key => {
+        const [r, c] = key.split('-').map(Number);
+        newTilePos = [r, c];
+      });
+
+      updateTilesFromMove(prevBoardRef.current, state.board, lastDirectionRef.current, newTilePos, state.mergedTiles);
+      prevBoardRef.current = state.board.map(row => [...row]);
+    }
+  }, [state.board, state.newTiles, state.mergedTiles, updateTilesFromMove]);
+
   // Check for challenge completion
   useEffect(() => {
     if (state.highestTile >= challenge.targetTile && !completedRef.current) {
@@ -122,6 +149,7 @@ export const SeasonalChallengeGame = ({
   }, [state.highestTile, challenge.targetTile, season.id, challenge.id, onComplete]);
 
   const handleMove = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    lastDirectionRef.current = direction;
     setState(prev => {
       if (prev.gameOver || prev.won) return prev;
 
@@ -199,6 +227,9 @@ export const SeasonalChallengeGame = ({
   const restart = () => {
     completedRef.current = false;
     setShowVictory(false);
+    resetTiles();
+    prevBoardRef.current = null;
+    
     const board = createEmptyBoard(challenge.boardSize);
     const pos1 = addRandomTile(board);
     const pos2 = addRandomTile(board);
@@ -216,6 +247,14 @@ export const SeasonalChallengeGame = ({
       mergedTiles: new Set(),
     });
   };
+
+  // Re-init tiles after restart
+  useEffect(() => {
+    if (prevBoardRef.current === null && state.board.some(row => row.some(v => v > 0))) {
+      initializeTiles(state.board);
+      prevBoardRef.current = state.board.map(row => [...row]);
+    }
+  }, [state.board, initializeTiles]);
 
   const baseTheme = season.themes[0]?.themeValue as Theme || 'classic';
 
@@ -269,8 +308,7 @@ export const SeasonalChallengeGame = ({
           board={state.board}
           size={challenge.boardSize}
           theme={baseTheme}
-          newTiles={state.newTiles}
-          mergedTiles={state.mergedTiles}
+          tiles={tiles}
           onMove={handleMove}
         />
 
