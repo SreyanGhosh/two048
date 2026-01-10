@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useGame2048, Theme } from '@/hooks/useGame2048';
 import { GameHeader } from './GameHeader';
 import { GameBoard } from './GameBoard';
 import { GameOverlay } from './GameOverlay';
 import { getThemeBackground } from '@/hooks/useThemeData';
+import { useTileAnimations } from '@/hooks/useTileAnimations';
 
 interface ClassicGameProps {
   initialTheme: Theme;
@@ -35,8 +36,35 @@ export const ClassicGame = ({
     setSize,
   } = useGame2048(4);
 
+  const { tiles, initializeTiles, updateTilesFromMove } = useTileAnimations(size);
+  const prevBoardRef = useRef<number[][] | null>(null);
+  const lastDirectionRef = useRef<'up' | 'down' | 'left' | 'right'>('up');
+
   const [showOverlay, setShowOverlay] = useState(false);
   const [hasReportedEnd, setHasReportedEnd] = useState(false);
+
+  // Initialize tiles on first render
+  useEffect(() => {
+    if (tiles.length === 0) {
+      initializeTiles(board);
+      prevBoardRef.current = board.map(row => [...row]);
+    }
+  }, [board, tiles.length, initializeTiles]);
+
+  // Update tiles when board changes from move
+  useEffect(() => {
+    if (prevBoardRef.current && JSON.stringify(prevBoardRef.current) !== JSON.stringify(board)) {
+      // Find new tile position
+      let newTilePos: [number, number] | null = null;
+      newTiles.forEach(key => {
+        const [r, c] = key.split('-').map(Number);
+        newTilePos = [r, c];
+      });
+
+      updateTilesFromMove(prevBoardRef.current, board, lastDirectionRef.current, newTilePos, mergedTiles);
+      prevBoardRef.current = board.map(row => [...row]);
+    }
+  }, [board, newTiles, mergedTiles, updateTilesFromMove]);
 
   // Set initial theme from equipped theme
   useEffect(() => {
@@ -57,6 +85,26 @@ export const ClassicGame = ({
       onGameEnd(score, highestTile);
     }
   }, [gameOver, won, showOverlay, hasReportedEnd, board, score, onGameEnd]);
+
+  const handleMove = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    lastDirectionRef.current = direction;
+    move(direction);
+  }, [move]);
+
+  const handleNewGame = useCallback(() => {
+    initGame();
+    prevBoardRef.current = null;
+    setShowOverlay(false);
+    setHasReportedEnd(false);
+  }, [initGame]);
+
+  // Re-init tiles after new game
+  useEffect(() => {
+    if (prevBoardRef.current === null && board.some(row => row.some(v => v > 0))) {
+      initializeTiles(board);
+      prevBoardRef.current = board.map(row => [...row]);
+    }
+  }, [board, initializeTiles]);
 
   // Get theme-based background
   const bgStyle = getThemeBackground(theme);
@@ -82,7 +130,7 @@ export const ClassicGame = ({
         theme={theme}
         onSizeChange={setSize}
         onThemeChange={() => {}} // No-op, theme changes via inventory
-        onNewGame={() => initGame()}
+        onNewGame={handleNewGame}
         unlockedThemes={unlockedThemes}
         hideThemeSelector={true}
       />
@@ -92,9 +140,8 @@ export const ClassicGame = ({
           board={board}
           size={size}
           theme={theme}
-          newTiles={newTiles}
-          mergedTiles={mergedTiles}
-          onMove={move}
+          tiles={tiles}
+          onMove={handleMove}
         />
 
         <GameOverlay
@@ -102,11 +149,7 @@ export const ClassicGame = ({
           score={score}
           won={won}
           theme={theme}
-          onNewGame={() => {
-            initGame();
-            setShowOverlay(false);
-            setHasReportedEnd(false);
-          }}
+          onNewGame={handleNewGame}
           onClose={() => setShowOverlay(false)}
         />
       </div>

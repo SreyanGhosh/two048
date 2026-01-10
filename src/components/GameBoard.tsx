@@ -1,17 +1,17 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { GameTile, getGridColor, getBoardTexture } from './GameTile';
+import { AnimatedTile, getGridColor, getBoardTexture } from './GameTile';
 import type { Theme } from '@/hooks/useGame2048';
+import type { Tile } from '@/hooks/useTileAnimations';
 
 interface GameBoardProps {
   board: number[][];
   size: number;
   theme: Theme;
-  newTiles: Set<string>;
-  mergedTiles: Set<string>;
+  tiles: Tile[];
   onMove: (direction: 'up' | 'down' | 'left' | 'right') => void;
 }
 
-export const GameBoard = ({ board, size, theme, newTiles, mergedTiles, onMove }: GameBoardProps) => {
+export const GameBoard = ({ board, size, theme, tiles, onMove }: GameBoardProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -75,7 +75,7 @@ export const GameBoard = ({ board, size, theme, newTiles, mergedTiles, onMove }:
   return (
     <div
       ref={containerRef}
-      className="game-grid touch-none"
+      className="game-grid touch-none relative"
       style={{
         backgroundColor: getGridColor(theme),
         backgroundImage: boardTexture,
@@ -83,26 +83,44 @@ export const GameBoard = ({ board, size, theme, newTiles, mergedTiles, onMove }:
         backgroundSize: '64px 64px',
         width: gridSize,
         height: gridSize,
-        display: 'grid',
-        gridTemplateColumns: `repeat(${size}, 1fr)`,
-        gap: gap,
-        padding: gap,
+        borderRadius: '8px',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {board.map((row, r) =>
-        row.map((value, c) => (
-          <GameTile
-            key={`${r}-${c}`}
-            value={value}
-            size={tileSize}
-            theme={theme}
-            isNew={newTiles.has(`${r}-${c}`)}
-            isMerged={mergedTiles.has(`${r}-${c}`)}
+      {/* Background grid cells */}
+      <div
+        className="absolute inset-0"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${size}, 1fr)`,
+          gap: gap,
+          padding: gap,
+        }}
+      >
+        {Array.from({ length: size * size }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-md"
+            style={{
+              backgroundColor: 'rgba(238, 228, 218, 0.35)',
+              width: tileSize,
+              height: tileSize,
+            }}
           />
-        ))
-      )}
+        ))}
+      </div>
+
+      {/* Animated tiles */}
+      {tiles.map(tile => (
+        <AnimatedTile
+          key={tile.id}
+          tile={tile}
+          tileSize={tileSize}
+          gap={gap}
+          theme={theme}
+        />
+      ))}
     </div>
   );
 };
