@@ -1,13 +1,13 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { AnimatedTile } from './GameTile';
+import { GameTile } from './GameTile';
 import type { Theme } from '@/hooks/useGame2048';
-import type { Tile } from '@/hooks/useTileAnimations';
 
 interface GameBoardProps {
   board: number[][];
   size: number;
   theme: Theme;
-  tiles: Tile[];
+  newTiles: Set<string>;
+  mergedTiles: Set<string>;
   onMove: (direction: 'up' | 'down' | 'left' | 'right') => void;
 }
 
@@ -65,7 +65,7 @@ const getGridColor = (theme: Theme): string => {
   return colors[theme] || '#bbada0';
 };
 
-export const GameBoard = ({ board, size, theme, tiles, onMove }: GameBoardProps) => {
+export const GameBoard = ({ board, size, theme, newTiles, mergedTiles, onMove }: GameBoardProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -129,9 +129,13 @@ export const GameBoard = ({ board, size, theme, tiles, onMove }: GameBoardProps)
   return (
     <div
       ref={containerRef}
-      className="game-grid touch-none relative"
+      className="game-grid touch-none"
       style={{
         backgroundColor: gridColor,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${size}, 1fr)`,
+        gap: gap,
+        padding: gap,
         width: gridSize,
         height: gridSize,
         borderRadius: '8px',
@@ -139,39 +143,21 @@ export const GameBoard = ({ board, size, theme, tiles, onMove }: GameBoardProps)
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Background grid cells */}
-      <div
-        className="absolute inset-0"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${size}, 1fr)`,
-          gap: gap,
-          padding: gap,
-        }}
-      >
-        {Array.from({ length: size * size }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-md"
-            style={{
-              backgroundColor: 'rgba(238, 228, 218, 0.35)',
-              width: tileSize,
-              height: tileSize,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Animated tiles */}
-      {tiles.map(tile => (
-        <AnimatedTile
-          key={tile.id}
-          tile={tile}
-          tileSize={tileSize}
-          gap={gap}
-          theme={theme}
-        />
-      ))}
+      {board.map((row, rowIndex) =>
+        row.map((value, colIndex) => {
+          const key = `${rowIndex}-${colIndex}`;
+          return (
+            <GameTile
+              key={key}
+              value={value}
+              size={tileSize}
+              theme={theme}
+              isNew={newTiles.has(key)}
+              isMerged={mergedTiles.has(key)}
+            />
+          );
+        })
+      )}
     </div>
   );
 };
