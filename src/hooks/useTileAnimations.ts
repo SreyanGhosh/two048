@@ -28,7 +28,7 @@ export const useTileAnimations = (size: number) => {
             value: board[r][c],
             row: r,
             col: c,
-            isNew: true,
+            isNew: false, // Don't animate initial tiles
             isMerged: false,
           });
         }
@@ -178,7 +178,7 @@ export const useTileAnimations = (size: number) => {
         isNew: false,
         isMerged: false,
       })));
-    }, 150);
+    }, 100);
   }, [size]);
 
   const resetTiles = useCallback(() => {
